@@ -1,0 +1,19 @@
+name: fmtya
+description: GitHub Action to run yamlfmt
+
+author: norwd
+branding:
+  icon: edit
+  color: blue
+
+runs:
+  using: composite
+  steps:
+
+    - name: Install yamlfmt
+      shell: bash
+      run: go install github.com/google/yamlfmt/cmd/yamlfmt@latest
+
+    - name: Run yamlfmt
+      shell: bash
+      run: yamlfmt
