@@ -11,6 +11,10 @@ settings set to their default values. This will run `yamlfmt` on the repository
 and if any yaml files are reformatted, it will commit them back to the branch
 that was pushed.
 
+Note that if the default token is used, GitHub Action workflow files cannot be
+formatted. This is due to a limitation in GitHub's permissions system. See the
+[advanced setup](#advanced-setup) example to see how to format workflow files.
+
 ```yaml
 ---
 
@@ -24,12 +28,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: norwd/fmtya@v1
+        with:
+          exclude-files: '.github/workflows/*.{yaml,yml}'
 ```
 
 ### Advanced Setup
 
 A more advanced setup can customise everything from the commit's message down to
-the specific version of the `yamlfmt` backend!
+the specific version of the `yamlfmt` backend! The configuration options `fmtya`
+uses are loosely based on the [`.yamlfmt`] file format.
+
+[`.yamlfmt`]: https://github.com/google/yamlfmt#configuration
 
 ```yaml
 ---
@@ -59,6 +68,25 @@ jobs:
           // select a specific version of `yamlfmt`, any released version can be 
           // pecifically requested.
           yamlfmt-version: vX.Y.Z
+
+          // If there are files in your repo that follow a different convention,
+          // are auto-generated, or you just don't want to format for any reason
+          // at all, you can exclude specific files, or only selectively include
+          // certain files. The patterns are parsed by `yamlfmt`, and internally
+          // use https://github.com/bmatcuk/doublestar.
+          exclude-files: test/data/*.{yaml,yml}
+          include-files: |
+            **/*.{yaml,yml}
+            .yamlfmt
+
+          // Specific formatting options to configure the size of indents, or if
+          // yaml anchors or aliases should or shouldn't be allowed, can be used
+          // to control how yamlfmt formats the files in your repository.
+          indent-size: 2
+          line-ending-type: crlf
+          include-document-start: false
+          keep-line-breaks: false
+          disallow-anchors: true
 
           // If the default commit message is too generic, or you want to create
           // a custom commit message, for example, from the output of a previous
