@@ -47,7 +47,7 @@ inputs:
     description: "How big to make each indent level."
 
   include-document-start:
-    default: false
+    default: true
     description: "Whether yaml files should begin with `---` at the start."
 
   line-ending-type:
@@ -55,7 +55,7 @@ inputs:
     description: "Determines the type of newline characters to use, must be either `lf` or `crlf`."
 
   keep-line-breaks:
-    default: false
+    default: true
     description: "Keep existing line breaks in formatted yaml."
 
   disallow-anchors:
