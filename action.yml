@@ -19,7 +19,7 @@ runs:
         
     - name: Debug
       shell: bash
-      run: ls $GOPATH/bin
+      run: echo "$GOPATH/bin"
 
     - name: Run yamlfmt
       shell: bash
