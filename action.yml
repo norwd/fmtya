@@ -1,3 +1,4 @@
+---
 name: fmtya
 description: GitHub Action to run yamlfmt
 author: norwd
@@ -54,7 +55,7 @@ runs:
       run: |
         ~/go/bin/yamlfmt
     - name: Setup GPG Keys
-      if: inputs.signing-private-key != '' && inputs.signing-passphrase != ''
+      if: inputs.signing-private-key != ''
       continue-on-error: true
       uses: crazy-max/ghaction-import-gpg@v5
       with:
@@ -62,18 +63,10 @@ runs:
         passphrase: ${{ inputs.signing-passphrase }}
         git_user_signingkey: true
         git_commit_gpgsign: true
-    - name: Commit Changes (Signed)
-      if: inputs.signing-private-key != '' && inputs.signing-passphrase != ''
-      uses: stefanzweifel/git-auto-commit-action@v4
-      with:
-        commit_user_name: ${{ inputs.commit-user-name }}
-        commit_user_email: ${{ inputs.commit-user-email }}
-        commit_message: ${{ inputs.commit-message }}
-        commit_options: -S
     - name: Commit Changes
-      if: inputs.signing-private-key == '' || inputs.signing-passphrase == ''
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_user_name: ${{ inputs.commit-user-name }}
         commit_user_email: ${{ inputs.commit-user-email }}
         commit_message: ${{ inputs.commit-message }}
+        commit_options: ${{ inputs.signing-private-key == '' && '-S' || '' }}
