@@ -9,7 +9,7 @@ branding:
 inputs:
 
   token:
-    default: ${{ github.server_url == 'https://github.com' && github.token || '' }}
+    default: ${{ github.server_url == 'https://github.com' && secrets.GITHUB_TOKEN || '' }}
     description: |
       Used to authenticate with GitHub, since there's a default, this is typically not supplied by the user.
       * When running this action on github.com, the default value is sufficient.
