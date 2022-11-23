@@ -53,6 +53,7 @@ runs:
       uses: actions/checkout@v2
       with:
         ref: ${{ github.head_ref }}
+        token: ${{ inputs.token }}
 
     - name: Setup Go
       uses: actions/setup-go@v3
