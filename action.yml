@@ -14,7 +14,7 @@ inputs:
     description: |
       The specifc version of the yamlfmt tool to use, defaults to the latest vailable version.
   commit-message:
-    required: true
+    default: Auto yamlfmt
     description: |
       The message used to commit any changes made by yamlfmt.
   commit-user-name:
