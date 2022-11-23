@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Run fmtya
-        uses: norwd/fmtya@main
+        uses: norwd/fmtya@v1
         with:
           token: ${{ secrets.SELF_FMTYA || secrets.GITHUB_TOKEN }}
           yamlfmt-version: v0.6.0
