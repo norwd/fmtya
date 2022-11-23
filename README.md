@@ -19,7 +19,7 @@ jobs:
   yamlfmt:
     runs-on: ubuntu-latest
     steps:
-      - uses: norwd/fmtya@main
+      - uses: norwd/fmtya@v1
 ```
 
 ### Advanced Setup
@@ -35,7 +35,7 @@ jobs:
   yamlfmt:
     runs-on: ubuntu-latest
     steps:
-      - uses: norwd/fmtya@main // or specify the latest version, e.g. vX.Y.Z
+      - uses: norwd/fmtya@v1
         with:
 
           // Due to how GitHub's permissions system is set up, the default token
