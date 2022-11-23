@@ -15,6 +15,7 @@ jobs:
   run-self:
     name: Run fmtya on itself
     runs-on: ubuntu-latest
+
     steps:
 
       - name: Checkout
@@ -24,3 +25,4 @@ jobs:
         uses: ./
         with:
           commit-message: Auto yamlfmt
+          token: ${{ secrets.TESTING_PAT || secrets.GITHUB_TOKEN }}
