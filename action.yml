@@ -17,7 +17,7 @@ runs:
       shell: bash
       run: |
         go install github.com/google/yamlfmt/cmd/yamlfmt@latest
-        command -v yamlfmt
+        ls $GOPATH/bin
 
     - name: Run yamlfmt
       shell: bash
