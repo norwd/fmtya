@@ -49,6 +49,11 @@ runs:
   using: composite
   steps:
 
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ github.head_ref }}
+
     - name: Setup Go
       uses: actions/setup-go@v3
       with:
