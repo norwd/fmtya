@@ -1,81 +1,65 @@
 name: fmtya
 description: GitHub Action to run yamlfmt
-
 author: norwd
 branding:
   icon: edit
   color: blue
-
 inputs:
-
   token:
     required: true
     description: |
       Used to authenticate with GitHub, when running this action on github.com, `secrets.GITHUB_TOKEN` is sufficient. When running on enterprise, you can pass a PAT if you are experiencing rate limiting.
-
   yamlfmt-version:
     default: latest
     description: |
       The specifc version of the yamlfmt tool to use, defaults to the latest vailable version.
-
   commit-message:
     required: true
     description: |
       The message used to commit any changes made by yamlfmt.
-
   commit-user-name:
     default: github-actions[bot]
     description: |
       Who the commit should be attributed to, defaults to the GitHub Actions bot.
-
   commit-user-email:
     default: 41898282+github-actions[bot]@users.noreply.github.com
     description: |
       Who the commit should be attributed to, defaults to the GitHub Actions bot.
-
   signing-private-key:
     description: |
       A GPG private key to sign the commit with. This must be exported as an ASCII armored version or its base64 encoding.
-
   signing-passphrase:
     description: |
       The password or passphrase for the signing key, if one was used.
-
 runs:
   using: composite
   steps:
-
     - name: Checkout
       uses: actions/checkout@v2
       with:
         ref: ${{ github.head_ref }}
         token: ${{ inputs.token }}
-
     - name: Setup Go
       uses: actions/setup-go@v3
       with:
         token: ${{ inputs.token }}
-
     - name: Install yamlfmt
       shell: bash
       env:
         YAMLFMT_VERSION: ${{ inputs.yamlfmt-version }}
       run: |
         go install "github.com/google/yamlfmt/cmd/yamlfmt@$YAMLFMT_VERSION"
-
     - name: Run yamlfmt
       shell: bash
       run: |
         ~/go/bin/yamlfmt
-
     - name: Check for Changes
       id: changes
       uses: tj-actions/verify-changed-files@v12
       with:
         files: |
-           **.yaml
-           **.yml
-
+          **.yaml
+          **.yml
     - name: Setup GPG Keys
       if: steps.changes.outputs.files_changed == 'true' && inputs.signing-private-key != '' && inputs.signing-passphrase != ''
       continue-on-error: true
@@ -85,7 +69,6 @@ runs:
         passphrase: ${{ inputs.signing-passphrase }}
         git_user_signingkey: true
         git_commit_gpgsign: true
-
     - name: Commit Changes (Signed)
       if: steps.changes.outputs.files_changed == 'true' && inputs.signing-private-key != '' && inputs.signing-passphrase != ''
       uses: stefanzweifel/git-auto-commit-action@v4
@@ -94,7 +77,6 @@ runs:
         commit_user_email: ${{ inputs.commit-user-email }}
         commit_message: ${{ inputs.commit-message }}
         commit_options: -S
-
     - name: Commit Changes
       if: steps.changes.outputs.files_changed == 'true' && (inputs.signing-private-key == '' && inputs.signing-passphrase == '')
       uses: stefanzweifel/git-auto-commit-action@v4
