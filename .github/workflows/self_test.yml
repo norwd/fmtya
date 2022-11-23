@@ -1,5 +1,5 @@
-name: "Main"
-run-name: "Main workflow started by @${{ github.actor }}"
+name: "Self Test"
+run-name: "Self Test workflow started by @${{ github.actor }}"
 on:
   push:
 jobs:
