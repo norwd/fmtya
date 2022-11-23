@@ -29,6 +29,7 @@ jobs:
           keep-line-breaks: true
           disallow-anchors: true
           include-files: |
+            **/*.{yaml,yml}
             .github/testing/nonexisting.yml
           exclude-files: |
             .github/testing/bad.yml
