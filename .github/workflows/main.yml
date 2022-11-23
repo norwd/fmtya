@@ -16,5 +16,4 @@ jobs:
       - name: Run fmtya
         uses: ./
         with:
-          commit-message: Auto yamlfmt
           token: ${{ secrets.TESTING_PAT || secrets.GITHUB_TOKEN }}
