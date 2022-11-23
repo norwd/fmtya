@@ -12,39 +12,52 @@ inputs:
   token:
     default: ${{ github.token }}
     description: "Used to authenticate with GitHub, this should be a PAT with `repo: write` and `workflow: write` permissions."
+  
   yamlfmt-version:
     default: "latest"
     description: "The specifc version of the yamlfmt tool to use, defaults to the latest vailable version."
+  
   commit-message:
     default: "Auto yamlfmt"
     description: "The message used to commit any changes made by yamlfmt."
+  
   commit-user-name:
     default: "github-actions[bot]"
     description: "Who the commit should be attributed to, defaults to the GitHub Actions bot."
+  
   commit-user-email:
     default: "41898282+github-actions[bot]@users.noreply.github.com"
     description: "Who the commit should be attributed to, defaults to the GitHub Actions bot."
+  
   signing-private-key:
     description: "A GPG private key to sign the commit with. This must be exported as an ASCII armored version or its base64 encoding."
+  
   signing-passphrase:
     description: "The password or passphrase for the signing key, if one was used."
+  
   include-files:
     default: "**/*.{yaml,yml}"
     description: "Which files or file patterns to include in the formatter, one pattern per line. Defaults to all yaml files. The glob paths are implemented using the bmatcuk/doublestar package."
+  
   exclude-files:
     description: "Which files or file patterns to exclude from the formatter, one pattern per line. Glob paths follow the same format as `include-files`."
+  
   indent-size:
     default: 2
     description: "How big to make each indent level."
+  
   include-document-start:
     default: false
     description: "Whether yaml files should begin with `---` at the start."
+  
   line-ending-type:
     default: "lf"
     description: "Determines the type of newline characters to use, must be either `lf` or `crlf`."
+  
   keep-line-breaks:
     default: false
     description: "Keep existing line breaks in formatted yaml."
+  
   disallow-anchors:
     default: false
     description: "Whether to reject any YAML anchors or aliases found in the document."
@@ -88,20 +101,24 @@ runs:
 
         echo "include-files=$(echo "$INCLUDE_FILES" | jq -R | jq -R | jq -s | jq -r tostring)" >> "$GITHUB_OUTPUT"
         echo "exclude-files=$(echo "$EXCLUDE_FILES" | jq -R | jq -R | jq -s | jq -r tostring)" >> "$GITHUB_OUTPUT"
+    
     - name: "Checkout"
       uses: actions/checkout@v2
       with:
         ref: ${{ github.head_ref }}
         token: ${{ inputs.token }}
+    
     - name: "Setup Go"
       uses: actions/setup-go@v3
       with:
         token: ${{ inputs.token }}
+    
     - name: "Install yamlfmt"
       shell: bash
       env:
         VERSION: ${{ inputs.yamlfmt-version }}
       run: go install "github.com/google/yamlfmt/cmd/yamlfmt@$VERSION"
+    
     - name: "Configure yamlfmt"
       shell: bash
       run: |
@@ -120,9 +137,11 @@ runs:
           retain_line_breaks: ${{ inputs.keep-line-breaks }}
           disallow_anchors: ${{ inputs.disallow-anchors }}
         EOF
+    
     - name: "Run yamlfmt"
       shell: bash
       run: ~/go/bin/yamlfmt -conf "${{ runner.temp }}/yamlfmt.conf"
+    
     - name: "Setup GPG Keys"
       if: inputs.signing-private-key != ''
       continue-on-error: true
@@ -132,6 +151,7 @@ runs:
         passphrase: ${{ inputs.signing-passphrase }}
         git_user_signingkey: true
         git_commit_gpgsign: true
+    
     - name: "Commit Changes"
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
