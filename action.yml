@@ -9,11 +9,9 @@ branding:
 inputs:
 
   token:
-    default: ${{ github.server_url == 'https://github.com' && secrets.GITHUB_TOKEN || '' }}
+    required: true
     description: |
-      Used to authenticate with GitHub, since there's a default, this is typically not supplied by the user.
-      * When running this action on github.com, the default value is sufficient.
-      * When running on GHES, you can pass a personal access token for github.com if you are experiencing rate limiting.
+      Used to authenticate with GitHub, when running this action on github.com, ${{ format('{0}{{ {1} }}', '$', 'secrets.GITHUB_TOKEN') }} is sufficient. When running on enterprise, you can pass a PAT if you are experiencing rate limiting.
 
   yamlfmt-version:
     default: latest
