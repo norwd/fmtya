@@ -15,12 +15,15 @@ runs:
 
     - name: Install yamlfmt
       shell: bash
-      run: go install github.com/google/yamlfmt/cmd/yamlfmt@latest
+      run: |
+        go install github.com/google/yamlfmt/cmd/yamlfmt@latest
         
     - name: Debug
       shell: bash
-      run: echo "$GOPATH/bin"
+      run: |
+        echo "$GOPATH/bin"
 
     - name: Run yamlfmt
       shell: bash
-      run: yamlfmt
+      run: |
+        yamlfmt
