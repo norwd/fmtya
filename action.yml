@@ -28,10 +28,12 @@ inputs:
       Note: if you want the commit to be signed, you must specify `signing-private-key`.
 
   commit-user-name:
+    default: github-actions[bot]
     description: |
       Who the commit should be attributed to, defaults to the GitHub Actions bot.
 
   commit-user-email:
+    default: 41898282+github-actions[bot]@users.noreply.github.com
     description: |
       Who the commit should be attributed to, defaults to the GitHub Actions bot.
 
