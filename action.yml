@@ -21,7 +21,7 @@ runs:
     - name: Debug
       shell: bash
       run: |
-        echo "$GOPATH/bin"
+        ls ~/go/bin
 
     - name: Run yamlfmt
       shell: bash
