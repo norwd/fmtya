@@ -1,10 +1,13 @@
 ---
+
 name: fmtya
 author: norwd
 description: "GitHub Action to run yamlfmt"
+
 branding:
   icon: edit
   color: blue
+
 inputs:
   token:
     default: ${{ github.token }}
@@ -45,6 +48,7 @@ inputs:
   disallow-anchors:
     default: false
     description: "Whether to reject any YAML anchors or aliases found in the document."
+
 runs:
   using: composite
   steps:
