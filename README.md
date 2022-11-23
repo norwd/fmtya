@@ -1,6 +1,6 @@
 # fmtya
 
-GitHub Action to run yamlfmt
+GitHub Action to run [yamlfmt](https://github.com/google/yamlfmt)
 
 ## Usage
 
