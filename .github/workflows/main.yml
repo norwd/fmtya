@@ -1,3 +1,4 @@
+---
 name: "Main"
 run-name: "Main workflow started by @${{ github.actor }}"
 on:
@@ -8,6 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Run fmtya
-        uses: norwd/fmtya@main
+        uses: norwd/fmtya@${{ github.sha }}
         with:
           token: ${{ secrets.TESTING_PAT || secrets.GITHUB_TOKEN }}
