@@ -1,3 +1,5 @@
+---
+
 name: "Self Test"
 run-name: "Self Test workflow started by @${{ github.actor }}"
 on:
@@ -23,7 +25,7 @@ jobs:
           signing-passphrase: ${{ secrets.AUTO_COMMIT_GPG_PASSPHRASE_FMTYA }}
 
           # yamlfmt configuration
-          include document-start: true
+          include-document-start: false
           keep-line-breaks: true
           disallow-anchors: true
           include-files: |
