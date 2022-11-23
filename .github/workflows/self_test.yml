@@ -12,10 +12,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Unformat a yaml file
-        run: |
-          echo "  " >> .github/workflows/self_test.yml
-          echo "  " >> .github/workflows/self_test.yml
       - name: Run fmtya
         uses: ./
         with:
