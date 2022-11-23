@@ -103,7 +103,7 @@ runs:
         echo "exclude-files=$(echo "$EXCLUDE_FILES" | jq -R | jq -R | jq -s | jq -r tostring)" >> "$GITHUB_OUTPUT"
 
     - name: "Checkout"
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         ref: ${{ github.head_ref }}
         token: ${{ inputs.token }}
