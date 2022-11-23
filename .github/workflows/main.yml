@@ -2,6 +2,7 @@
 
 name: "Main"
 run-name: "Main workflow started by @${{ github.actor }}"
+permissions: write-all
 
 on:
   push:
