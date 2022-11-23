@@ -23,8 +23,6 @@ inputs:
     description: |
       The message used to commit any changes made by yamlfmt.
 
-      Note: if you want the commit to be signed, you must specify `signing-private-key`.
-
   commit-user-name:
     default: github-actions[bot]
     description: |
