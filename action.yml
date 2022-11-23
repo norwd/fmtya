@@ -10,6 +10,9 @@ runs:
   using: composite
   steps:
 
+    - name: Setup Go
+      uses: actions/setup-go@v3
+
     - name: Install yamlfmt
       shell: bash
       run: go install github.com/google/yamlfmt/cmd/yamlfmt@latest
