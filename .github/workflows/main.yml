@@ -10,4 +10,4 @@ jobs:
       - name: Run fmtya
         uses: norwd/fmtya@main
         with:
-          token: ${{ secrets.TESTING_PAT || secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.SELF_FMTYA || secrets.GITHUB_TOKEN }}
