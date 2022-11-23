@@ -14,6 +14,13 @@ jobs:
         with:
           token: ${{ secrets.SELF_FMTYA || secrets.GITHUB_TOKEN }}
           yamlfmt-version: v0.6.0
+          include-files: |
+            .github/testing/nonexisting.yml
+          exclude-files: |
+            .github/testing/bad.yml
+          include_document_start: true
+          retain_line_breaks: true
+          disallow_anchors: true
           commit-user-name: norwd
           commit-user-email: 106889957+norwd@users.noreply.github.com
           signing-private-key: ${{ secrets.AUTO_COMMIT_GPG_PRIVATE_KEY_FMTYA }}
