@@ -1,3 +1,4 @@
+---
 name: fmtya
 author: norwd
 description: "GitHub Action to run yamlfmt"
