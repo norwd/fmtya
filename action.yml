@@ -11,7 +11,7 @@ inputs:
   token:
     required: true
     description: |
-      Used to authenticate with GitHub, when running this action on github.com, ${{{ secrets.GITHUB_TOKEN }}} is sufficient. When running on enterprise, you can pass a PAT if you are experiencing rate limiting.
+      Used to authenticate with GitHub, when running this action on github.com, `secrets.GITHUB_TOKEN` is sufficient. When running on enterprise, you can pass a PAT if you are experiencing rate limiting.
 
   yamlfmt-version:
     default: latest
