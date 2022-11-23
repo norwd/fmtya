@@ -81,8 +81,8 @@ runs:
         [ -z "$KEEP_LINE_BREAKS" ] && die "No keep line breaks setting provided"
         [ -z "$DISALLOW_ANCHORS" ] && die "No disallow anchors setting provided"
 
-        echo "include-files=$(echo "$INCLUDE_FILES" | jq -R | jq -s | jq -r tostring)" >> "$GITHUB_OUTPUT"
-        echo "exclude-files=$(echo "$EXCLUDE_FILES" | jq -R | jq -s | jq -r tostring)" >> "$GITHUB_OUTPUT"
+        echo "include-files=$(echo "$INCLUDE_FILES" | jq -R | jq -R | jq -s | jq -r tostring)" >> "$GITHUB_OUTPUT"
+        echo "exclude-files=$(echo "$EXCLUDE_FILES" | jq -R | jq -R | jq -s | jq -r tostring)" >> "$GITHUB_OUTPUT"
     - name: "Checkout"
       uses: actions/checkout@v2
       with:
