@@ -7,30 +7,23 @@ branding:
 inputs:
   token:
     default: ${{ github.token }}
-    description: |
-      Used to authenticate with GitHub, when running this action on github.com, `secrets.GITHUB_TOKEN` is sufficient. When running on enterprise, you can pass a PAT if you are experiencing rate limiting.
+    description: Used to authenticate with GitHub, this should be a PAT with `repo: write` and `workflow: write` permissions.
   yamlfmt-version:
     default: latest
-    description: |
-      The specifc version of the yamlfmt tool to use, defaults to the latest vailable version.
+    description: The specifc version of the yamlfmt tool to use, defaults to the latest vailable version.
   commit-message:
     default: Auto yamlfmt
-    description: |
-      The message used to commit any changes made by yamlfmt.
+    description: The message used to commit any changes made by yamlfmt.
   commit-user-name:
     default: github-actions[bot]
-    description: |
-      Who the commit should be attributed to, defaults to the GitHub Actions bot.
+    description: Who the commit should be attributed to, defaults to the GitHub Actions bot.
   commit-user-email:
     default: 41898282+github-actions[bot]@users.noreply.github.com
-    description: |
-      Who the commit should be attributed to, defaults to the GitHub Actions bot.
+    description: Who the commit should be attributed to, defaults to the GitHub Actions bot.
   signing-private-key:
-    description: |
-      A GPG private key to sign the commit with. This must be exported as an ASCII armored version or its base64 encoding.
+    description: A GPG private key to sign the commit with. This must be exported as an ASCII armored version or its base64 encoding.
   signing-passphrase:
-    description: |
-      The password or passphrase for the signing key, if one was used.
+    description: The password or passphrase for the signing key, if one was used.
 runs:
   using: composite
   steps:
@@ -46,13 +39,11 @@ runs:
     - name: Install yamlfmt
       shell: bash
       env:
-        YAMLFMT_VERSION: ${{ inputs.yamlfmt-version }}
-      run: |
-        go install "github.com/google/yamlfmt/cmd/yamlfmt@$YAMLFMT_VERSION"
+        VERSION: ${{ inputs.yamlfmt-version }}
+      run: go install "github.com/google/yamlfmt/cmd/yamlfmt@$VERSION"
     - name: Run yamlfmt
       shell: bash
-      run: |
-        ~/go/bin/yamlfmt
+      run: ~/go/bin/yamlfmt
     - name: Setup GPG Keys
       if: inputs.signing-private-key != ''
       continue-on-error: true
