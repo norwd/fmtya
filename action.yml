@@ -50,19 +50,19 @@ runs:
     - name: "Validate Configuration"
       id: config
       shell: bash
-        env:
-          TOKEN: ${{ inputs.token }}
-          YAMLFMT_VERSION: ${{ inputs.yamlfmt-version }}
-          COMMIT_MESSAGE: ${{ inputs.commit-message }}
-          COMMIT_USER_NAME: ${{ inputs.commit-user-name }}
-          COMMIT_USER_EMAIL: ${{ inputs.commit-user-email }}
-          INCLUDE_FILES: ${{ inputs.include-files }}
-          EXCLUDE_FILES: ${{ inputs.exclude-files }}
-          INDENT_SIZE: ${{ inputs.indent-size }}
-          INCLUDE_DOC_START: ${{ inputs.include-document-start }}
-          LINE_ENDING_TYPE: ${{ inputs.line-ending-type }}
-          KEEP_LINE_BREAKS: ${{ inputs.keep-line-breaks }}
-          DISALLOW_ANCHORS: ${{ inputs.disallow-anchors }}
+      env:
+        TOKEN: ${{ inputs.token }}
+        YAMLFMT_VERSION: ${{ inputs.yamlfmt-version }}
+        COMMIT_MESSAGE: ${{ inputs.commit-message }}
+        COMMIT_USER_NAME: ${{ inputs.commit-user-name }}
+        COMMIT_USER_EMAIL: ${{ inputs.commit-user-email }}
+        INCLUDE_FILES: ${{ inputs.include-files }}
+        EXCLUDE_FILES: ${{ inputs.exclude-files }}
+        INDENT_SIZE: ${{ inputs.indent-size }}
+        INCLUDE_DOC_START: ${{ inputs.include-document-start }}
+        LINE_ENDING_TYPE: ${{ inputs.line-ending-type }}
+        KEEP_LINE_BREAKS: ${{ inputs.keep-line-breaks }}
+        DISALLOW_ANCHORS: ${{ inputs.disallow-anchors }}
       run: |
         die() {
           echo "::error::$@"
