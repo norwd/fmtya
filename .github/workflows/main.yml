@@ -7,6 +7,7 @@ jobs:
     name: Run fmtya on itself
     runs-on: ubuntu-latest
     steps:
+    
       - name: Run fmtya
         uses: norwd/fmtya@main
         with:
