@@ -11,6 +11,7 @@ jobs:
         uses: norwd/fmtya@main
         with:
           token: ${{ secrets.SELF_FMTYA || secrets.GITHUB_TOKEN }}
+          yamlfmt-version: v0.6.0
           commit-user-name: norwd
           commit-user-email: 106889957+norwd@users.noreply.github.com
           signing-private-key: ${{ secrets.AUTO_COMMIT_GPG_PRIVATE_KEY_FMTYA }}
