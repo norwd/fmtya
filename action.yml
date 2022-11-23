@@ -15,7 +15,9 @@ runs:
 
     - name: Install yamlfmt
       shell: bash
-      run: go install github.com/google/yamlfmt/cmd/yamlfmt@latest
+      run: |
+        go install github.com/google/yamlfmt/cmd/yamlfmt@latest
+        command -v yamlfmt
 
     - name: Run yamlfmt
       shell: bash
