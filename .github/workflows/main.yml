@@ -14,6 +14,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Run fmtya
-        uses: norwd/fmtya@${{ github.ref }}
+        uses: norwd/fmtya@${{ github.sha }}
         with:
           token: ${{ secrets.TESTING_PAT || secrets.GITHUB_TOKEN }}
