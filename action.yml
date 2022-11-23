@@ -17,13 +17,8 @@ runs:
       shell: bash
       run: |
         go install github.com/google/yamlfmt/cmd/yamlfmt@latest
-        
-    - name: Debug
-      shell: bash
-      run: |
-        pwd
 
     - name: Run yamlfmt
       shell: bash
       run: |
-        yamlfmt
+        ~/go/bin/yamlfmt
