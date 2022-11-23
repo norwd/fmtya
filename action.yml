@@ -21,7 +21,7 @@ runs:
     - name: Debug
       shell: bash
       run: |
-        ls ~/go/bin
+        pwd
 
     - name: Run yamlfmt
       shell: bash
