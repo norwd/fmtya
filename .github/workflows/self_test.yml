@@ -2,9 +2,6 @@ name: "Self Test"
 run-name: "Self Test workflow started by @${{ github.actor }}"
 on:
   push:
-defaults:
-  run:
-    shell: bash
 jobs:
   run-self:
     name: Run fmtya on itself
