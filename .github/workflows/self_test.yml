@@ -14,9 +14,8 @@ jobs:
       - name: Run fmtya
         uses: ./
         with:
-          # misc settings
+          # permission settings
           token: ${{ secrets.SELF_FMTYA || secrets.GITHUB_TOKEN }}
-          yamlfmt-version: v0.6.0
 
           # commit information
           commit-user-name: norwd
@@ -25,9 +24,6 @@ jobs:
           signing-passphrase: ${{ secrets.AUTO_COMMIT_GPG_PASSPHRASE_FMTYA }}
 
           # yamlfmt configuration
-          include-document-start: true
-          keep-line-breaks: true
-          disallow-anchors: true
           include-files: |
             **/*.{yaml,yml}
             .github/testing/nonexisting.yml
