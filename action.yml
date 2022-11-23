@@ -53,15 +53,8 @@ runs:
       shell: bash
       run: |
         ~/go/bin/yamlfmt
-    - name: Check for Changes
-      id: changes
-      uses: tj-actions/verify-changed-files@v12
-      with:
-        files: |
-          **.yaml
-          **.yml
     - name: Setup GPG Keys
-      if: steps.changes.outputs.files_changed == 'true' && inputs.signing-private-key != '' && inputs.signing-passphrase != ''
+      if: inputs.signing-private-key != '' && inputs.signing-passphrase != ''
       continue-on-error: true
       uses: crazy-max/ghaction-import-gpg@v5
       with:
@@ -70,7 +63,7 @@ runs:
         git_user_signingkey: true
         git_commit_gpgsign: true
     - name: Commit Changes (Signed)
-      if: steps.changes.outputs.files_changed == 'true' && inputs.signing-private-key != '' && inputs.signing-passphrase != ''
+      if: inputs.signing-private-key != '' && inputs.signing-passphrase != ''
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_user_name: ${{ inputs.commit-user-name }}
@@ -78,7 +71,7 @@ runs:
         commit_message: ${{ inputs.commit-message }}
         commit_options: -S
     - name: Commit Changes
-      if: steps.changes.outputs.files_changed == 'true' && (inputs.signing-private-key == '' && inputs.signing-passphrase == '')
+      if: inputs.signing-private-key == '' || inputs.signing-passphrase == ''
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_user_name: ${{ inputs.commit-user-name }}
