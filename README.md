@@ -12,9 +12,13 @@ and if any yaml files are reformatted, it will commit them back to the branch
 that was pushed.
 
 ```yaml
+---
+
 name: "Format yaml files"
+
 on:
   push:
+
 jobs:
   yamlfmt:
     runs-on: ubuntu-latest
@@ -28,9 +32,13 @@ A more advanced setup can customise everything from the commit's message down to
 the specific version of the `yamlfmt` backend!
 
 ```yaml
+---
+
 name: "Format yaml files"
+
 on:
   push:
+
 jobs:
   yamlfmt:
     runs-on: ubuntu-latest
