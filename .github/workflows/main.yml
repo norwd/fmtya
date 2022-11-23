@@ -1,31 +1,20 @@
----
-
 name: "Main"
 run-name: "Main workflow started by @${{ github.actor }}"
 permissions: write-all
-
 on:
   push:
-
 defaults:
   run:
     shell: bash
-
 jobs:
   run-self:
     name: Run fmtya on itself
     runs-on: ubuntu-latest
-
     steps:
-
       - name: Checkout
         uses: actions/checkout@v2
-
       - name: Run fmtya
         uses: ./
         with:
           commit-message: Auto yamlfmt
           token: ${{ secrets.TESTING_PAT || secrets.GITHUB_TOKEN }}
-
-
-                       
