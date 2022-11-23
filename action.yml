@@ -6,19 +6,95 @@ branding:
   icon: edit
   color: blue
 
+inputs:
+
+  token:
+    default: ${{ github.server_url == 'https://github.com' && github.token || '' }}
+    description: |
+      Used to authenticate with GitHub, since there's a default, this is typically not supplied by the user.
+      * When running this action on github.com, the default value is sufficient.
+      * When running on GHES, you can pass a personal access token for github.com if you are experiencing rate limiting.
+
+  yamlfmt-version:
+    default: latest
+    description: |
+      The specifc version of the yamlfmt tool to use, defaults to the latest vailable version.
+
+  commit-message:
+    required: true
+    description: |
+      The message used to commit any changes made by yamlfmt.
+
+      Note: if you want the commit to be signed, you must specify `signing-private-key`.
+
+  commit-user-name:
+    description: |
+      Who the commit should be attributed to, defaults to the GitHub Actions bot.
+
+  commit-user-email:
+    description: |
+      Who the commit should be attributed to, defaults to the GitHub Actions bot.
+
+  signing-private-key:
+    description: |
+      A GPG private key to sign the commit with. This must be exported as an ASCII armored version or its base64 encoding.
+
+  signing-passphrase:
+    description: |
+      The password or passphrase for the signing key, if one was used.
+
 runs:
   using: composite
   steps:
 
     - name: Setup Go
       uses: actions/setup-go@v3
+      with:
+        token: ${{ inputs.token }}
 
     - name: Install yamlfmt
       shell: bash
+      env:
+        YAMLFMT_VERSION: ${{ inputs.yamlfmt-version }}
       run: |
-        go install github.com/google/yamlfmt/cmd/yamlfmt@latest
+        go install "github.com/google/yamlfmt/cmd/yamlfmt@$YAMLFMT_VERSION"
 
     - name: Run yamlfmt
       shell: bash
       run: |
         ~/go/bin/yamlfmt
+
+    - name: Check for Changes
+      id: changes
+      uses: tj-actions/verify-changed-files@v12
+      with:
+        files: |
+           **.yaml
+           **.yml
+
+    - name: Setup GPG Keys
+      if: steps.changes.outputs.files_changed == 'true' && inputs.signing-private-key != '' && inputs.signing-passphrase != ''
+      continue-on-error: true
+      uses: crazy-max/ghaction-import-gpg@v5
+      with:
+        gpg_private_key: ${{ inputs.signing-private-key }}
+        passphrase: ${{ inputs.signing-passphrase }}
+        git_user_signingkey: true
+        git_commit_gpgsign: true
+
+    - name: Commit Changes (Signed)
+      if: steps.changes.outputs.files_changed == 'true' && inputs.signing-private-key != '' && inputs.signing-passphrase != ''
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_user_name: ${{ inputs.commit-user-name }}
+        commit_user_email: ${{ inputs.commit-user-email }}
+        commit_message: ${{ commit-message }}
+        commit_options: -S
+
+    - name: Commit Changes
+      if: steps.changes.outputs.files_changed == 'true' && (inputs.signing-private-key == '' && inputs.signing-passphrase == '')
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_user_name: ${{ inputs.commit-user-name }}
+        commit_user_email: ${{ inputs.commit-user-email }}
+        commit_message: ${{ commit-message }}
