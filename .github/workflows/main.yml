@@ -1,7 +1,6 @@
 ---
 name: "Main"
 run-name: "Main workflow started by @${{ github.actor }}"
-permissions: write-all
 on:
   push:
 jobs:
@@ -12,6 +11,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Run fmtya
-        uses: norwd/fmtya@main
+        uses: ./
         with:
           token: ${{ secrets.TESTING_PAT || secrets.GITHUB_TOKEN }}
