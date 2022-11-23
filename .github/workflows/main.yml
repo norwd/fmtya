@@ -4,9 +4,6 @@ run-name: "Main workflow started by @${{ github.actor }}"
 permissions: write-all
 on:
   push:
-defaults:
-  run:
-    shell: bash
 jobs:
   run-self:
     name: Run fmtya on itself
