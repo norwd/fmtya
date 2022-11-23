@@ -17,4 +17,9 @@ jobs:
     name: Run fmtya on itself
     runs-on: ubuntu-latest
     steps:
-      - uses: ./
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Run fmtya
+        uses: ./
