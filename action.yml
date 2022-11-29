@@ -87,6 +87,12 @@ runs:
           exit 1
         }
 
+        mask() {
+          echo "::add-mask::$@"
+        }
+
+        mask "$TOKEN"
+
         [ -z "$TOKEN" ] && die "No token provided"
         [ -z "$YAMLFMT_VERSION" ] && die "No yamlfmt version provided"
         [ -z "$COMMIT_MESSAGE" ] && die "No commit message provided"
@@ -117,11 +123,15 @@ runs:
       shell: bash
       env:
         VERSION: ${{ inputs.yamlfmt-version }}
-      run: go install "github.com/google/yamlfmt/cmd/yamlfmt@$VERSION"
+      run: |
+        echo "::group::Installing yamlfmt..."
+        go install "github.com/google/yamlfmt/cmd/yamlfmt@$VERSION"
+        echo "::endgroup::"
 
     - name: "Configure yamlfmt"
       shell: bash
       run: |
+        echo "::group::Configuring yamlfmt..."
         cat << 'EOF' > ${{ runner.temp }}/yamlfmt.conf
         include:
           - ${{ join(fromJSON(steps.config.outputs.include-files), '
@@ -137,10 +147,14 @@ runs:
           retain_line_breaks: ${{ inputs.keep-line-breaks }}
           disallow_anchors: ${{ inputs.disallow-anchors }}
         EOF
+        echo "::endgroup::"
 
     - name: "Run yamlfmt"
       shell: bash
-      run: ~/go/bin/yamlfmt -conf "${{ runner.temp }}/yamlfmt.conf"
+      run: |
+        echo "::group::Running yamlfmt..."
+        ~/go/bin/yamlfmt -conf "${{ runner.temp }}/yamlfmt.conf"
+        echo "::endgroup::"
 
     - name: "Setup GPG Keys"
       if: inputs.signing-private-key != ''
