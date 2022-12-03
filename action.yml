@@ -10,7 +10,6 @@ branding:
 
 inputs:
   token:
-    default: ${{ github.token }}
     description: "Used to authenticate with GitHub, this should be a PAT with `repo: write` and `workflow: write` permissions."
 
   yamlfmt-version:
@@ -69,7 +68,6 @@ runs:
       id: config
       shell: bash
       env:
-        TOKEN: ${{ inputs.token }}
         YAMLFMT_VERSION: ${{ inputs.yamlfmt-version }}
         COMMIT_MESSAGE: ${{ inputs.commit-message }}
         COMMIT_USER_NAME: ${{ inputs.commit-user-name }}
@@ -87,7 +85,6 @@ runs:
           exit 1
         }
 
-        [ -z "$TOKEN" ] && die "No token provided"
         [ -z "$YAMLFMT_VERSION" ] && die "No yamlfmt version provided"
         [ -z "$COMMIT_MESSAGE" ] && die "No commit message provided"
         [ -z "$COMMIT_USER_NAME" ] && die "No commit user name provided"
@@ -106,12 +103,12 @@ runs:
       uses: actions/checkout@v3
       with:
         ref: ${{ github.head_ref }}
-        token: ${{ inputs.token }}
+        token: ${{ inputs.token || github.token }}
 
     - name: "Setup Go"
       uses: actions/setup-go@v3
       with:
-        token: ${{ inputs.token }}
+        token: ${{ inputs.token || github.token }}
 
     - name: "Install yamlfmt"
       shell: bash
