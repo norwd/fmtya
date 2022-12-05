@@ -2,20 +2,38 @@
 
 name: "Self Test"
 run-name: "Self Test workflow started by @${{ github.actor }}"
+
 on:
   push:
+
 jobs:
   run-self:
     name: Run fmtya on itself
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      checks: read
+      contents: write
+      deployments: read
+      issues: read
+      discussions: read
+      packages: write
+      pages: read
+      pull-requests: read
+      repository-projects: read
+      security-events: read
+      statuses: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Run fmtya
         uses: ./
         with:
+
           # permission settings
-          token: ${{ secrets.SELF_FMTYA || secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
           # commit information
           commit-user-name: norwd
@@ -24,8 +42,7 @@ jobs:
           signing-passphrase: ${{ secrets.AUTO_COMMIT_GPG_PASSPHRASE_FMTYA }}
 
           # yamlfmt configuration
+          exclude-files: .github/testing/bad.yml
           include-files: |
             **/*.{yaml,yml}
             .github/testing/nonexisting.yml
-          exclude-files: |
-            .github/testing/bad.yml
