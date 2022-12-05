@@ -10,11 +10,6 @@ jobs:
   run-self:
     name: Run fmtya on itself
     runs-on: ubuntu-latest
-    permissions:
-      actions: write
-      contents: write
-      statuses: write
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -24,7 +19,7 @@ jobs:
         with:
 
           # permission settings
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.SELF_FMTYA || secrets.GITHUB_TOKEN }}
 
           # commit information
           commit-user-name: norwd
