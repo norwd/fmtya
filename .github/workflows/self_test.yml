@@ -5,7 +5,7 @@ run-name: "Self Test workflow started by @${{ github.actor }}"
 
 on:
   push:
-
+     
 jobs:
   run-self:
     name: Run fmtya on itself
@@ -35,5 +35,7 @@ jobs:
           # yamlfmt configuration
           exclude-files: .github/testing/bad.yml
           include-files: |
-            **/*.{yaml,yml}
+            **.yaml
+            **.yml
+            **.cff
             .github/testing/nonexisting.yml
