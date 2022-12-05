@@ -5,7 +5,7 @@ run-name: "Self Test workflow started by @${{ github.actor }}"
 
 on:
   push:
-   
+
 jobs:
   run-self:
     name: Run fmtya on itself
