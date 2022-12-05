@@ -11,9 +11,9 @@ settings set to their default values. This will run `yamlfmt` on the repository
 and if any yaml files are reformatted, it will commit them back to the branch
 that was pushed.
 
-Note that if the default token is used, GitHub Action workflow files cannot be
-formatted. This is due to a limitation in GitHub's permissions system. See the
-[advanced setup](#advanced-setup) example to see how to format workflow files.
+Note that the `actions: write` permission is also needed in addition to just the
+`contents: write` permission on its own. This is due to a limitation in GitHub's
+permissions system.
 
 ```yaml
 ---
@@ -26,6 +26,11 @@ on:
 jobs:
   yamlfmt:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: write
+      statuses: write
+
     steps:
       - uses: norwd/fmtya@v1
         with:
@@ -51,15 +56,21 @@ on:
 jobs:
   yamlfmt:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: write
+      statuses: write
+
     steps:
       - uses: norwd/fmtya@v1
         with:
 
           // Due to how GitHub's permissions system is set up, the default token
-          // does not have the necessary access to update workflow files. If you
-          // want to want `fmtya` to format the files in the `.github/workflows`
-          // directory, you will need to set up a PAT with at least write access
-          // to both the `repo` and `workflows` permissions.
+          // may not have the necessary access to update workflow files. Setting
+          // the `actions: write` permission, as well as `contents: write`, will
+          // allow `fmtya` to operate without explicitly setting a token or PAT.
+          // However, a custom PAT (for example a fine-grained token scoped down
+          // to just the one repository) can be specified.
           token: ${{ secrets.<YOUR_PAT> }}
 
           // By default, `fmtya` uses the latest available version of `yamlfmt`.
