@@ -35,7 +35,7 @@ jobs:
           # yamlfmt configuration
           exclude-files: .github/testing/bad.yml
           include-files: |
-            **.yaml
-            **.yml
-            **.cff
+            **/*.yaml
+            **/*.yml
+            **/*.cff
             .github/testing/nonexisting.yml
