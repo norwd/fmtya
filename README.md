@@ -101,6 +101,14 @@ jobs:
           commit-user-name: <YOUR_GITHUB_USERNAME>
           commit-user-email: <YOUR_GITHUB_EMAIL
 
+          // Not to be confused with signing a commit with the GPG key provided,
+          // a true boolean value for `signoff-on-commit` will add the `-s` flag
+          // to the commit command. This appends the `Signed-off-by` trailler to
+          // the commit message, certifying the commit.
+          //
+          // See also: http://developercertificate.org
+          signoff-on-commit: yes
+
           // By default, the commits are not signed, which may make them show as
           // unverified if any of the co-authors have vigilant mode turned on in
           // their GitHub account settings. You can enable signed commits with a
