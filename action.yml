@@ -96,8 +96,8 @@ runs:
         [ -z "$KEEP_LINE_BREAKS" ] && die "No keep line breaks setting provided"
         [ -z "$DISALLOW_ANCHORS" ] && die "No disallow anchors setting provided"
 
-        echo "include-files=$(echo "$INCLUDE_FILES" | jq -R | jq -R | jq -s | jq -r tostring)" >> "$GITHUB_OUTPUT"
-        echo "exclude-files=$(echo "$EXCLUDE_FILES" | jq -R | jq -R | jq -s | jq -r tostring)" >> "$GITHUB_OUTPUT"
+        echo "include-files=$(echo "$INCLUDE_FILES" | awk 'NF>0' | jq -R | jq -R | jq -s | jq -r tostring)" | tee -a "$GITHUB_OUTPUT"
+        echo "exclude-files=$(echo "$EXCLUDE_FILES" | awk 'NF>0' | jq -R | jq -R | jq -s | jq -r tostring)" | tee -a "$GITHUB_OUTPUT"
 
     - name: "Checkout"
       uses: actions/checkout@v3
@@ -120,11 +120,11 @@ runs:
       shell: bash
       run: |
         cat << 'EOF' > ${{ runner.temp }}/yamlfmt.conf
-        include:
-          - ${{ join(fromJSON(steps.config.outputs.include-files), '
+        include:${{ steps.config.outputs.include-files && '
+          - '|| '' }}${{ join(fromJSON(steps.config.outputs.include-files), '
           - ') || '' }}
-        exclude:
-          - ${{ join(fromJSON(steps.config.outputs.exclude-files), '
+        exclude:${{ steps.config.outputs.exclude-files && '
+          - '|| '' }}${{ join(fromJSON(steps.config.outputs.exclude-files), '
           - ') || '' }}
         formatter:
           type: basic
