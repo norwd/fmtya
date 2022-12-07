@@ -4,7 +4,7 @@ name: "Self Test"
 run-name: "Self Test workflow started by @${{ github.actor }}"
 
 on:
-  push:
+  push: 
 
 jobs:
   run-self:
@@ -29,3 +29,6 @@ jobs:
 
           # yamlfmt configuration
           exclude-files: .github/testing/bad.yml
+          include-files: |
+            **/*.{yaml,yml}
+            .github/testing/nonexisting.yml
