@@ -182,7 +182,4 @@ runs:
         commit_user_name: ${{ inputs.commit-user-name }}
         commit_user_email: ${{ inputs.commit-user-email }}
         commit_message: ${{ inputs.commit-message }}
-        commit_options: ${{ join([
-          inputs.signing-private-key != '' && '-S' || '',
-          steps.config.outputs.signoff-on-commit == 'true' && '-s' || '',
-        ], ' ') }}
+        commit_options: ${{ inputs.signing-private-key != '' && '-S' || '' }} ${{steps.config.outputs.signoff-on-commit == 'true' && '-s' || '' }}
