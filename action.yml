@@ -34,6 +34,10 @@ inputs:
   signing-passphrase:
     description: "The password or passphrase for the signing key, if one was used."
 
+  signoff-on-commit:
+    default: false
+    description: "Certify the commit, this will use the provided username and email. See https://developercertificate.org"
+
   include-files:
     default: "**/*.{yaml,yml}"
     description: "Which files or file patterns to include in the formatter, one pattern per line. Defaults to all yaml files. The glob paths are implemented using the bmatcuk/doublestar package."
@@ -68,10 +72,12 @@ runs:
       id: config
       shell: bash
       env:
+        LOG_TITLE: "Validation"
         YAMLFMT_VERSION: ${{ inputs.yamlfmt-version }}
         COMMIT_MESSAGE: ${{ inputs.commit-message }}
         COMMIT_USER_NAME: ${{ inputs.commit-user-name }}
         COMMIT_USER_EMAIL: ${{ inputs.commit-user-email }}
+        SIGNOFF_ON_COMMIT: ${{ inputs.signoff-on-commit }}
         INCLUDE_FILES: ${{ inputs.include-files }}
         EXCLUDE_FILES: ${{ inputs.exclude-files }}
         INDENT_SIZE: ${{ inputs.indent-size }}
@@ -81,14 +87,23 @@ runs:
         DISALLOW_ANCHORS: ${{ inputs.disallow-anchors }}
       run: |
         die() {
-          echo "::error::$@"
+          echo "::error title=${LOG_TITLE}::$@"
           exit 1
+        }
+
+        err() {
+          echo "::warning title=${LOG_TITLE}::$@"
+        }
+
+        log() {
+          echo "::notice title=${LOG_TITLE}::$@"
         }
 
         [ -z "$YAMLFMT_VERSION" ] && die "No yamlfmt version provided"
         [ -z "$COMMIT_MESSAGE" ] && die "No commit message provided"
         [ -z "$COMMIT_USER_NAME" ] && die "No commit user name provided"
         [ -z "$COMMIT_USER_EMAIL" ] && die "No commit user email provided"
+        [ -z "$SIGNOFF_ON_COMMIT" ] &&  err "No signoff on commit provided"
         [ -z "$INCLUDE_FILES" ] && die "No include files provided"
         [ -z "$INDENT_SIZE" ] && die "No indent size provided"
         [ -z "$INCLUDE_DOC_START" ] && die "No include document start setting provided"
@@ -155,4 +170,6 @@ runs:
         commit_user_name: ${{ inputs.commit-user-name }}
         commit_user_email: ${{ inputs.commit-user-email }}
         commit_message: ${{ inputs.commit-message }}
-        commit_options: ${{ inputs.signing-private-key != '' && '-S' || '' }}
+        commit_options: |
+          ${{ inputs.signing-private-key != '' && '-S' || '' }}
+          ${{ inputs.signoff-on-commit   != '' && '-s' || '' }}
