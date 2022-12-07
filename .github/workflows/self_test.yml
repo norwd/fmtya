@@ -26,7 +26,7 @@ jobs:
           commit-user-email: 106889957+norwd@users.noreply.github.com
           signing-private-key: ${{ secrets.AUTO_COMMIT_GPG_PRIVATE_KEY_FMTYA }}
           signing-passphrase: ${{ secrets.AUTO_COMMIT_GPG_PASSPHRASE_FMTYA }}
-          signoff-on-commit: ${{ github.actor == github.repository_owner }}
+          signoff-on-commit: ${{ github.actor == github.repository_owner && 'yes' || 'no' }}
 
           # yamlfmt configuration
           exclude-files: .github/testing/bad.yml
