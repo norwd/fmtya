@@ -34,6 +34,10 @@ inputs:
   signing-passphrase:
     description: "The password or passphrase for the signing key, if one was used."
 
+  signoff-on-commit:
+    default: false
+    description: "Certify the commit, this will use the provided username and email. Must be one of 'true', 'false', 'yes', or 'no'. See https://developercertificate.org"
+
   include-files:
     default: "**/*.{yaml,yml}"
     description: "Which files or file patterns to include in the formatter, one pattern per line. Defaults to all yaml files. The glob paths are implemented using the bmatcuk/doublestar package."
@@ -68,10 +72,12 @@ runs:
       id: config
       shell: bash
       env:
+        LOG_TITLE: "Validation"
         YAMLFMT_VERSION: ${{ inputs.yamlfmt-version }}
         COMMIT_MESSAGE: ${{ inputs.commit-message }}
         COMMIT_USER_NAME: ${{ inputs.commit-user-name }}
         COMMIT_USER_EMAIL: ${{ inputs.commit-user-email }}
+        SIGNOFF_ON_COMMIT: ${{ inputs.signoff-on-commit }}
         INCLUDE_FILES: ${{ inputs.include-files }}
         EXCLUDE_FILES: ${{ inputs.exclude-files }}
         INDENT_SIZE: ${{ inputs.indent-size }}
@@ -81,20 +87,41 @@ runs:
         DISALLOW_ANCHORS: ${{ inputs.disallow-anchors }}
       run: |
         die() {
-          echo "::error::$@"
+          echo "::error title=${LOG_TITLE}::$@"
           exit 1
+        }
+
+        err() {
+          echo "::warning title=${LOG_TITLE}::$@"
+        }
+
+        log() {
+          echo "::notice title=${LOG_TITLE}::$@"
         }
 
         [ -z "$YAMLFMT_VERSION" ] && die "No yamlfmt version provided"
         [ -z "$COMMIT_MESSAGE" ] && die "No commit message provided"
         [ -z "$COMMIT_USER_NAME" ] && die "No commit user name provided"
         [ -z "$COMMIT_USER_EMAIL" ] && die "No commit user email provided"
+        [ -z "$SIGNOFF_ON_COMMIT" ] &&  err "No signoff on commit provided"
         [ -z "$INCLUDE_FILES" ] && die "No include files provided"
         [ -z "$INDENT_SIZE" ] && die "No indent size provided"
         [ -z "$INCLUDE_DOC_START" ] && die "No include document start setting provided"
         [ -z "$LINE_ENDING_TYPE" ] && die "No line ending type provided"
         [ -z "$KEEP_LINE_BREAKS" ] && die "No keep line breaks setting provided"
         [ -z "$DISALLOW_ANCHORS" ] && die "No disallow anchors setting provided"
+
+        if [ "$SIGNOFF_ON_COMMIT" = "true" ] || [ "$SIGNOFF_ON_COMMIT" = "yes" ]
+        then
+          echo "signoff-on-commit=true" | tee -a "$GITHUB_OUTPUT"
+        else
+          if [ "$SIGNOFF_ON_COMMIT" != "false" ] && [ "$SIGNOFF_ON_COMMIT" != "no" ]
+          then
+            err "Invalid boolean for 'signoff on commit': $SIGNOFF_ON_COMMIT"
+          fi
+
+          echo "signoff-on-commit=false" | tee -a "$GITHUB_OUTPUT"
+        fi
 
         echo "include-files=$(echo "$INCLUDE_FILES" | awk 'NF>0' | jq -R | jq -R | jq -s | jq -r tostring)" | tee -a "$GITHUB_OUTPUT"
         echo "exclude-files=$(echo "$EXCLUDE_FILES" | awk 'NF>0' | jq -R | jq -R | jq -s | jq -r tostring)" | tee -a "$GITHUB_OUTPUT"
@@ -155,4 +182,4 @@ runs:
         commit_user_name: ${{ inputs.commit-user-name }}
         commit_user_email: ${{ inputs.commit-user-email }}
         commit_message: ${{ inputs.commit-message }}
-        commit_options: ${{ inputs.signing-private-key != '' && '-S' || '' }}
+        commit_options: ${{ inputs.signing-private-key != '' && '-S' || '' }} ${{steps.config.outputs.signoff-on-commit == 'true' && '-s' || '' }}
