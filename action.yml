@@ -115,7 +115,7 @@ runs:
         then
           echo "signoff-on-commit=true" | tee -a "$GITHUB_OUTPUT"
         else
-          if ! [ "$SIGNOFF_ON_COMMIT" = "false" ] || [ "$SIGNOFF_ON_COMMIT" = "no" ]
+          if [ "$SIGNOFF_ON_COMMIT" != "false" ] && [ "$SIGNOFF_ON_COMMIT" != "no" ]
           then
             err "Invalid boolean for 'signoff on commit': $SIGNOFF_ON_COMMIT"
           fi
