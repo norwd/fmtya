@@ -36,7 +36,7 @@ inputs:
 
   signoff-on-commit:
     default: false
-    description: "Certify the commit, this will use the provided username and email. See https://developercertificate.org"
+    description: "Certify the commit, this will use the provided username and email. Must be one of 'true', 'false', 'yes', or 'no'. See https://developercertificate.org"
 
   include-files:
     default: "**/*.{yaml,yml}"
@@ -111,6 +111,18 @@ runs:
         [ -z "$KEEP_LINE_BREAKS" ] && die "No keep line breaks setting provided"
         [ -z "$DISALLOW_ANCHORS" ] && die "No disallow anchors setting provided"
 
+        if [ "$SIGNOFF_ON_COMMIT" = "true" ] || [ "$SIGNOFF_ON_COMMIT" = "yes" ]
+        then
+          echo "signoff-on-commit=true" | tee -a "$GITHUB_OUTPUT"
+        else
+          if ! [ "$SIGNOFF_ON_COMMIT" = "false" ] || [ "$SIGNOFF_ON_COMMIT" = "no" ]
+          then
+            err "Invalid boolean for 'signoff on commit': $SIGNOFF_ON_COMMIT"
+          fi
+
+          echo "signoff-on-commit=false" | tee -a "$GITHUB_OUTPUT"
+        fi
+
         echo "include-files=$(echo "$INCLUDE_FILES" | awk 'NF>0' | jq -R | jq -R | jq -s | jq -r tostring)" | tee -a "$GITHUB_OUTPUT"
         echo "exclude-files=$(echo "$EXCLUDE_FILES" | awk 'NF>0' | jq -R | jq -R | jq -s | jq -r tostring)" | tee -a "$GITHUB_OUTPUT"
 
@@ -170,4 +182,7 @@ runs:
         commit_user_name: ${{ inputs.commit-user-name }}
         commit_user_email: ${{ inputs.commit-user-email }}
         commit_message: ${{ inputs.commit-message }}
-        commit_options: ${{ inputs.signing-private-key != '' && '-S' || '' }} ${{ inputs.signoff-on-commit != '' && '-s' || '' }}
+        commit_options: ${{ join([
+          inputs.signing-private-key != '' && '-S' || '',
+          steps.config.outputs.signoff-on-commit == 'true' && '-s' || '',
+        ], ' ') }}
