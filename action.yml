@@ -120,12 +120,8 @@ runs:
       shell: bash
       run: |
         cat << 'EOF' > ${{ runner.temp }}/yamlfmt.conf
-        include:${{ steps.config.outputs.include-files && '
-          - ' || '' }}${{ join(fromJSON(steps.config.outputs.include-files), '
-          - ') || '' }}
-        exclude:${{ steps.config.outputs.exclude-files && '
-          - ' || '' }}${{ join(fromJSON(steps.config.outputs.exclude-files), '
-          - ') || '' }}
+        include: fromJSON(steps.config.outputs.include-files)
+        exclude: fromJSON(steps.config.outputs.exclude-files)
         formatter:
           type: basic
           indent: ${{ inputs.indent-size }}
