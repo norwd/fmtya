@@ -84,8 +84,8 @@ jobs:
       matrix:
         tag: ${{ fromJSON(toJSON(needs.*.outputs.tag)) }}
         exclude:
-          - tag: "v${{ github.ref_name }}"
+          - tag: "${{ github.ref_name }}"
     steps:
-      - name: "Tag v${{ github.ref_name }} as ${{ matrix.tag }}"
+      - name: "Tag ${{ github.ref_name }} as ${{ matrix.tag }}"
         run: |
-          echo "Latest ${{ matrix.tag }} Compatable Version is v${{ github.ref_name }}"
+          echo "Latest ${{ matrix.tag }} Compatable Version is ${{ github.ref_name }}"
