@@ -86,6 +86,13 @@ jobs:
         exclude:
           - tag: "${{ github.ref_name }}"
     steps:
-      - name: "Tag ${{ github.ref_name }} as ${{ matrix.tag }}"
+      - name: "Checkout ${{ github.ref_name }}"
+        uses: actions/checkout@v3
+        with:
+          token: "${{ secrets.AUTO_TAG_FMTYA }}"
+          ref: "${{ github.ref_name }}"
+
+      - name: "Tag ${{ matrix.tag }} at ${{ github.ref_name }}"
         run: |
-          echo "Latest ${{ matrix.tag }} Compatable Version is ${{ github.ref_name }}"
+          git tag --force --message "Latest ${{ matrix.tag }} Compatable Version" "${{ matrix.tag }}" "${{ github.ref_name }}"
+          #git push --force --tags
