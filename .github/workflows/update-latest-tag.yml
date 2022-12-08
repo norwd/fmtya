@@ -1,0 +1,32 @@
+---
+
+name: "Update Latest Version"
+run-name: "Updating Latest Version to ${{ github.ref_name }}"
+permissions:
+
+  # for metadata
+  contents: read
+  issues: read
+  pull-requests: read
+
+  # for publishing
+  deployments: write
+  discussions: write
+  packages: write
+
+defaults:
+  run:
+    shell: bash
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  tag_major_version:
+    name: "Tag Major Version"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Get Major Version"
+        run: |
+          echo "${{ github.ref_name }}"
