@@ -92,6 +92,14 @@ jobs:
           token: "${{ secrets.AUTO_TAG_FMTYA }}"
           ref: "${{ github.ref_name }}"
 
+      - uses: oleksiyrudenko/gha-git-credentials@v2.1.1
+        with:
+          global: true
+          name: "norwd"
+          actor: "norwd"
+          email: "106889957+norwd@users.noreply.github.com"
+          token: "${{ secrets.AUTO_TAG_FMTYA }}"
+
       - name: "Tag ${{ matrix.tag }} at ${{ github.ref_name }}"
         run: |
           git tag --force --message "Latest ${{ matrix.tag }} Compatable Version" "${{ matrix.tag }}" "${{ github.ref_name }}"
