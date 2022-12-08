@@ -92,7 +92,8 @@ jobs:
           token: "${{ secrets.AUTO_TAG_FMTYA }}"
           ref: "${{ github.ref_name }}"
 
-      - uses: oleksiyrudenko/gha-git-credentials@v2.1.1
+      - name: "Setup Git Credentials"
+        uses: oleksiyrudenko/gha-git-credentials@v2.1.1
         with:
           global: true
           name: "norwd"
@@ -100,7 +101,7 @@ jobs:
           email: "106889957+norwd@users.noreply.github.com"
           token: "${{ secrets.AUTO_TAG_FMTYA }}"
 
-      - name: Setup GPG Keys
+      - name: "Setup GPG Signing Key"
         uses: crazy-max/ghaction-import-gpg@v5
         with:
           gpg_private_key: ${{ secrets.AUTO_COMMIT_GPG_PRIVATE_KEY_FMTYA }}
@@ -114,4 +115,4 @@ jobs:
 
       - name: "Push ${{ matrix.tag }}"
         run: |
-          #git push --force --tags
+          git push --force --tags
