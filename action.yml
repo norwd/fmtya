@@ -127,7 +127,7 @@ runs:
         echo "exclude-files=$(echo "$EXCLUDE_FILES" | awk 'NF>0' | jq -R | jq -R | jq -s | jq -r tostring)" | tee -a "$GITHUB_OUTPUT"
 
     - name: "Checkout"
-      uses: actions/checkout@v3.1.0
+      uses: actions/checkout@v3.2.0
       with:
         ref: ${{ github.head_ref }}
         token: ${{ inputs.token || github.token }}
