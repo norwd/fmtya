@@ -133,7 +133,7 @@ runs:
         token: ${{ inputs.token || github.token }}
 
     - name: "Setup Go"
-      uses: actions/setup-go@v3.4.0
+      uses: actions/setup-go@v3.5.0
       with:
         token: ${{ inputs.token || github.token }}
 
