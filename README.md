@@ -1,19 +1,17 @@
 # fmtya
 
-GitHub Action to run [yamlfmt](https://github.com/google/yamlfmt)
+GitHub Action to run [yamlfmt]
 
 ## Usage
 
 ### Basic Setup
 
-The following is a reasonable, bare-minimum, setup. It runs `fmtya` with all the
-settings set to their default values. This will run `yamlfmt` on the repository
-and if any yaml files are reformatted, it will commit them back to the branch
-that was pushed.
+The following is a reasonable, bare-minimum, setup.
+It runs `fmtya` with all the settings set to their default values.
+This will run `yamlfmt` on the repository and if any yaml files are reformatted, it will commit them back to the branch that was pushed.
 
-Note that if the default token is used, GitHub Action workflow files cannot be
-formatted. This is due to a limitation in GitHub's permissions system. See the
-[advanced setup](#advanced-setup) example to see how to format workflow files.
+Note that if the default token is used, GitHub Action workflow files cannot be formatted.
+This is due to a limitation in GitHub's permissions system. See the [advanced setup] example to see how to format workflow files.
 
 ```yaml
 ---
@@ -34,11 +32,8 @@ jobs:
 
 ### Advanced Setup
 
-A more advanced setup can customise everything from the commit's message down to
-the specific version of the `yamlfmt` backend! The configuration options `fmtya`
-uses are loosely based on the [`.yamlfmt`] file format.
-
-[`.yamlfmt`]: https://github.com/google/yamlfmt#configuration
+A more advanced setup can customise everything from the commit's message down to the specific version of the `yamlfmt` backend!
+The configuration options `fmtya` uses are loosely based on the [`.yamlfmt`] file format.
 
 ```yaml
 ---
@@ -117,3 +112,7 @@ jobs:
           signing-private-key: ${{ secrets.<YOUR_GPG_SIGNING_KEY> }}
           signing-passphrase: ${{ secrets.<YOUR_GPG_PASSWORD> }}
 ```
+
+[yamlfmt]: https://github.com/google/yamlfmt
+[advanced setup]: #advanced-setup
+[`.yamlfmt`]: https://github.com/google/yamlfmt#configuration
