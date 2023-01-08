@@ -130,7 +130,7 @@ runs:
       shell: bash
       run: echo "::error title=Fmtya Input Validation Error::No include files provided" ; exit 1
 
-    - name: "Validate Configuration"
+    - name: "Parse Configuration"
       id: config
       shell: bash
       env:
