@@ -68,57 +68,64 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: "Report Invalid Yamlfmt Version"
+    - name: "Report Missing Yamlfmt Version"
       if: inputs.yamlfmt-version == ''
       shell: bash
       run: echo "::error title=Fmtya Input Validation Error::No yamlfmt version provided" ; exit 1
 
-    - name: "Report Invalid Commit Message"
+    - name: "Report Missing Commit Message"
       if: inputs.commit-message == ''
       shell: bash
       run: echo "::error title=Fmtya Input Validation Error::No commit message provided" ; exit 1
 
-    - name: "Report Invalid Commit User Name"
+    - name: "Report Missing Commit User Name"
       if: inputs.commit-user-name == ''
       shell: bash
       run: echo "::error title=Fmtya Input Validation Error::No commit user name provided" ; exit 1
 
-    - name: "Report Invalid Commit User Email"
+    - name: "Report Missing Commit User Email"
       if: inputs.commit-user-email == ''
       shell: bash
       run: echo "::error title=Fmtya Input Validation Error::No commit user email provided" ; exit 1
 
-    - name: "Report Invalid Indent Size"
+    - name: "Report Missing Indent Size"
       if: inputs.indent-size == ''
       shell: bash
       run: echo "::error title=Fmtya Input Validation Error::No indent size provided" ; exit 1
 
-    - name: "Report Invalid Include Document Start Setting"
+    - name: "Report Missing Include Document Start Setting"
       if: inputs.include-document-start == ''
       shell: bash
       run: echo "::error title=Fmtya Input Validation Error::No include document start setting provided" ; exit 1
 
-    - name: "Report Invalid Line Ending Type"
+    - name: "Report Missing Line Ending Type"
       if: inputs.line-ending-type == ''
       shell: bash
       run: echo "::error title=Fmtya Input Validation Error::No line ending type provided" ; exit 1
 
-    - name: "Report Invalid Line Breaks Setting"
+    - name: "Report Missing Line Breaks Setting"
       if: inputs.keep-line-breaks == ''
       shell: bash
       run: echo "::error title=Fmtya Input Validation Error::No keep line breaks setting provided" ; exit 1
 
-    - name: "Report Invalid Anchors Setting"
+    - name: "Report Missing Anchors Setting"
       if: inputs.disallow-anchors == ''
       shell: bash
       run: echo "::error title=Fmtya Input Validation Error::No disallow anchors setting provided" ; exit 1
 
-    - name: "Report Invalid Signoff On Commit"
-      if: inputs.inputs.signoff-on-commit == ''
+    - name: "Report Missing Signoff On Commit"
+      if: inputs.signoff-on-commit == ''
       shell: bash
       run: echo "::error title=Fmtya Input Validation Error::No signoff on commit provided" ; exit 1
 
-    - name: "Report Invalid Files To Format"
+    - name: "Report Invalid Signoff On Commit"
+      if: inputs.signoff-on-commit != 'true' && inputs.signoff-on-commit != 'false' && inputs.signoff-on-commit != 'yes' && inputs.signoff-on-commit != 'no'
+      shell: bash
+      run: echo "::error title=Fmtya Input Validation Error::Invalid boolean for 'signoff on commit': $SIGNOFF_ON_COMMIT" ; exit 1
+      env:
+        SIGNOFF_ON_COMMIT: ${{ inputs.signoff-on-commit }}
+
+    - name: "Report Missing Files To Format"
       if: inputs.include-files == ''
       shell: bash
       run: echo "::error title=Fmtya Input Validation Error::No include files provided" ; exit 1
@@ -126,24 +133,10 @@ runs:
     - name: "Validate Configuration"
       id: config
       shell: bash
-      env:
-        LOG_TITLE: "Validation"
-        SIGNOFF_ON_COMMIT: ${{ inputs.signoff-on-commit }}
         INCLUDE_FILES: ${{ inputs.include-files }}
         EXCLUDE_FILES: ${{ inputs.exclude-files }}
       run: |
-        if [ "$SIGNOFF_ON_COMMIT" = "true" ] || [ "$SIGNOFF_ON_COMMIT" = "yes" ]
-        then
-          echo "signoff-on-commit=true" | tee -a "$GITHUB_OUTPUT"
-        else
-          if [ "$SIGNOFF_ON_COMMIT" != "false" ] && [ "$SIGNOFF_ON_COMMIT" != "no" ]
-          then
-            err "Invalid boolean for 'signoff on commit': $SIGNOFF_ON_COMMIT"
-          fi
-
-          echo "signoff-on-commit=false" | tee -a "$GITHUB_OUTPUT"
-        fi
-
+        echo "signoff-on-commit=false" | tee -a "$GITHUB_OUTPUT"
         echo "include-files=$(echo "$INCLUDE_FILES" | awk 'NF>0' | jq -R | jq -R | jq -s | jq -r tostring)" | tee -a "$GITHUB_OUTPUT"
         echo "exclude-files=$(echo "$EXCLUDE_FILES" | awk 'NF>0' | jq -R | jq -R | jq -s | jq -r tostring)" | tee -a "$GITHUB_OUTPUT"
 
@@ -203,4 +196,4 @@ runs:
         commit_user_name: ${{ inputs.commit-user-name }}
         commit_user_email: ${{ inputs.commit-user-email }}
         commit_message: ${{ inputs.commit-message }}
-        commit_options: ${{ inputs.signing-private-key != '' && '-S' || '' }} ${{steps.config.outputs.signoff-on-commit == 'true' && '-s' || '' }}
+        commit_options: ${{ inputs.signing-private-key != '' && '-S' || '' }} ${{ steps.config.outputs.signoff-on-commit == 'true' && '-s' || '' }}
