@@ -133,6 +133,7 @@ runs:
     - name: "Validate Configuration"
       id: config
       shell: bash
+      env:
         INCLUDE_FILES: ${{ inputs.include-files }}
         EXCLUDE_FILES: ${{ inputs.exclude-files }}
       run: |
