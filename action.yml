@@ -138,8 +138,8 @@ runs:
         EXCLUDE_FILES: ${{ inputs.exclude-files }}
       run: |
         cat << 'EOF' > "$GITHUB_OUTPUT"
-        include-files=$(echo "$INCLUDE_FILES" | awk 'NF>0' | jq -R | jq -R | jq -s | jq -r tostring)
-        exclude-files=$(echo "$EXCLUDE_FILES" | awk 'NF>0' | jq -R | jq -R | jq -s | jq -r tostring)
+        include-files=`echo "$INCLUDE_FILES" | awk 'NF>0' | jq -R | jq -R | jq -s | jq -r tostring`
+        exclude-files=`echo "$EXCLUDE_FILES" | awk 'NF>0' | jq -R | jq -R | jq -s | jq -r tostring`
         EOF
 
     - name: "Configure yamlfmt"
