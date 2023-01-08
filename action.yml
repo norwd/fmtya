@@ -137,14 +137,16 @@ runs:
         INCLUDE_FILES: ${{ inputs.include-files }}
         EXCLUDE_FILES: ${{ inputs.exclude-files }}
       run: |
-        echo include-files=`echo "$INCLUDE_FILES" | awk 'NF>0' | jq -R | jq -R | jq -s | jq -r tostring` | tee -a "$GITHUB_OUTPUT"
-        echo exclude-files=`echo "$EXCLUDE_FILES" | awk 'NF>0' | jq -R | jq -R | jq -s | jq -r tostring` | tee -a "$GITHUB_OUTPUT"
+        DELIMITER="$(openssl rand -hex 8)"
+        echo "::add-mask::$DELIMITER"
+        echo "include-files=$(echo "$INCLUDE_FILES" | awk 'NF>0' | jq -R | jq -R | jq -s | jq -r tostring)" | tee -a "$GITHUB_OUTPUT"
+        echo "exclude-files=$(echo "$EXCLUDE_FILES" | awk 'NF>0' | jq -R | jq -R | jq -s | jq -r tostring)" | tee -a "$GITHUB_OUTPUT"
+        echo "delimiter=$DELIMITER" | tee -a "$GITHUB_OUTPUT"
 
     - name: "Configure yamlfmt"
       shell: bash
       run: |
-        EOF="$(openssl rand -hex 8)"
-        cat << "$EOF" | awk 'NF>0' | tee ${{ runner.temp }}/yamlfmt.conf
+        cat << ${{ steps.config.outputs.delimiter }} | awk 'NF>0' | tee ${{ runner.temp }}/yamlfmt.conf
         ${{ steps.config.outputs.include-files && 'include:
           - '|| '' }}${{ join(fromJSON(steps.config.outputs.include-files), '
           - ') || '' }}
@@ -158,7 +160,7 @@ runs:
           line_ending: ${{ inputs.line-ending-type }}
           retain_line_breaks: ${{ inputs.keep-line-breaks }}
           disallow_anchors: ${{ inputs.disallow-anchors }}
-        "$EOF"
+        ${{ steps.config.outputs.delimiter }}
 
     - name: "Checkout"
       uses: actions/checkout@v3.3.0
