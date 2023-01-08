@@ -121,7 +121,7 @@ runs:
     - name: "Report Invalid Signoff On Commit"
       if: inputs.signoff-on-commit != 'true' && inputs.signoff-on-commit != 'false' && inputs.signoff-on-commit != 'yes' && inputs.signoff-on-commit != 'no'
       shell: bash
-      run: echo "::error title=Fmtya Input Validation Error::Invalid boolean for 'signoff on commit': $SIGNOFF_ON_COMMIT" ; exit 1
+      run: echo "::error title=Fmtya Input Validation Error::Invalid boolean for signoff on commit '$SIGNOFF_ON_COMMIT'" ; exit 1
       env:
         SIGNOFF_ON_COMMIT: ${{ inputs.signoff-on-commit }}
 
@@ -136,9 +136,29 @@ runs:
         INCLUDE_FILES: ${{ inputs.include-files }}
         EXCLUDE_FILES: ${{ inputs.exclude-files }}
       run: |
-        echo "signoff-on-commit=false" | tee -a "$GITHUB_OUTPUT"
-        echo "include-files=$(echo "$INCLUDE_FILES" | awk 'NF>0' | jq -R | jq -R | jq -s | jq -r tostring)" | tee -a "$GITHUB_OUTPUT"
-        echo "exclude-files=$(echo "$EXCLUDE_FILES" | awk 'NF>0' | jq -R | jq -R | jq -s | jq -r tostring)" | tee -a "$GITHUB_OUTPUT"
+        cat << 'EOF' > "$GITHUB_OUTPUT"
+        include-files=$(echo "$INCLUDE_FILES" | awk 'NF>0' | jq -R | jq -R | jq -s | jq -r tostring)
+        exclude-files=$(echo "$EXCLUDE_FILES" | awk 'NF>0' | jq -R | jq -R | jq -s | jq -r tostring)
+        EOF
+
+    - name: "Configure yamlfmt"
+      shell: bash
+      run: |
+        cat << 'EOF' | awk 'NF>0' | tee ${{ runner.temp }}/yamlfmt.conf
+        ${{ steps.config.outputs.include-files && 'include:
+          - '|| '' }}${{ join(fromJSON(steps.config.outputs.include-files), '
+          - ') || '' }}
+        ${{ steps.config.outputs.exclude-files && 'exclude:
+          - '|| '' }}${{ join(fromJSON(steps.config.outputs.exclude-files), '
+          - ') || '' }}
+        formatter:
+          type: basic
+          indent: ${{ inputs.indent-size }}
+          include_document_start: ${{ inputs.include-document-start }}
+          line_ending: ${{ inputs.line-ending-type }}
+          retain_line_breaks: ${{ inputs.keep-line-breaks }}
+          disallow_anchors: ${{ inputs.disallow-anchors }}
+        EOF
 
     - name: "Checkout"
       uses: actions/checkout@v3.3.0
@@ -153,28 +173,9 @@ runs:
 
     - name: "Install yamlfmt"
       shell: bash
+      run: go install "github.com/google/yamlfmt/cmd/yamlfmt@$VERSION"
       env:
         VERSION: ${{ inputs.yamlfmt-version }}
-      run: go install "github.com/google/yamlfmt/cmd/yamlfmt@$VERSION"
-
-    - name: "Configure yamlfmt"
-      shell: bash
-      run: |
-        cat << 'EOF' > ${{ runner.temp }}/yamlfmt.conf
-        include:${{ steps.config.outputs.include-files && '
-          - '|| '' }}${{ join(fromJSON(steps.config.outputs.include-files), '
-          - ') || '' }}
-        exclude:${{ steps.config.outputs.exclude-files && '
-          - '|| '' }}${{ join(fromJSON(steps.config.outputs.exclude-files), '
-          - ') || '' }}
-        formatter:
-          type: basic
-          indent: ${{ inputs.indent-size }}
-          include_document_start: ${{ inputs.include-document-start }}
-          line_ending: ${{ inputs.line-ending-type }}
-          retain_line_breaks: ${{ inputs.keep-line-breaks }}
-          disallow_anchors: ${{ inputs.disallow-anchors }}
-        EOF
 
     - name: "Run yamlfmt"
       shell: bash
@@ -196,4 +197,6 @@ runs:
         commit_user_name: ${{ inputs.commit-user-name }}
         commit_user_email: ${{ inputs.commit-user-email }}
         commit_message: ${{ inputs.commit-message }}
-        commit_options: ${{ inputs.signing-private-key != '' && '-S' || '' }} ${{ steps.config.outputs.signoff-on-commit == 'true' && '-s' || '' }}
+        commit_options: >-
+          ${{ inputs.signing-private-key != '' && '-S' || '' }}
+          ${{ (inputs.signoff-on-commit == 'true' || inputs.signoff-on-commit == 'yes') && '-s' || '' }}
