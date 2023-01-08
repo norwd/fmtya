@@ -113,6 +113,16 @@ runs:
       shell: bash
       run: echo "::error title=Fmtya Input Validation Error::No disallow anchors setting provided" ; exit 1
 
+    - name: "Report Invalid Signoff On Commit"
+      if: inputs.inputs.signoff-on-commit == ''
+      shell: bash
+      run: echo "::error title=Fmtya Input Validation Error::No signoff on commit provided" ; exit 1
+
+    - name: "Report Invalid Files To Format"
+      if: inputs.include-files == ''
+      shell: bash
+      run: echo "::error title=Fmtya Input Validation Error::No include files provided" ; exit 1
+
     - name: "Validate Configuration"
       id: config
       shell: bash
@@ -122,7 +132,6 @@ runs:
         INCLUDE_FILES: ${{ inputs.include-files }}
         EXCLUDE_FILES: ${{ inputs.exclude-files }}
       run: |
-        [ -z "$SIGNOFF_ON_COMMIT" ] &&  err "No signoff on commit provided"
         if [ "$SIGNOFF_ON_COMMIT" = "true" ] || [ "$SIGNOFF_ON_COMMIT" = "yes" ]
         then
           echo "signoff-on-commit=true" | tee -a "$GITHUB_OUTPUT"
@@ -135,7 +144,6 @@ runs:
           echo "signoff-on-commit=false" | tee -a "$GITHUB_OUTPUT"
         fi
 
-        [ -z "$INCLUDE_FILES" ] && die "No include files provided"
         echo "include-files=$(echo "$INCLUDE_FILES" | awk 'NF>0' | jq -R | jq -R | jq -s | jq -r tostring)" | tee -a "$GITHUB_OUTPUT"
         echo "exclude-files=$(echo "$EXCLUDE_FILES" | awk 'NF>0' | jq -R | jq -R | jq -s | jq -r tostring)" | tee -a "$GITHUB_OUTPUT"
 
