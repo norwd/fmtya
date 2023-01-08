@@ -68,63 +68,99 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: "Validate Configuration"
+    - name: "Report Missing Yamlfmt Version"
+      if: inputs.yamlfmt-version == ''
+      shell: bash
+      run: echo "::error title=Fmtya Input Validation Error::No yamlfmt version provided" ; exit 1
+
+    - name: "Report Missing Commit Message"
+      if: inputs.commit-message == ''
+      shell: bash
+      run: echo "::error title=Fmtya Input Validation Error::No commit message provided" ; exit 1
+
+    - name: "Report Missing Commit User Name"
+      if: inputs.commit-user-name == ''
+      shell: bash
+      run: echo "::error title=Fmtya Input Validation Error::No commit user name provided" ; exit 1
+
+    - name: "Report Missing Commit User Email"
+      if: inputs.commit-user-email == ''
+      shell: bash
+      run: echo "::error title=Fmtya Input Validation Error::No commit user email provided" ; exit 1
+
+    - name: "Report Missing Indent Size"
+      if: inputs.indent-size == ''
+      shell: bash
+      run: echo "::error title=Fmtya Input Validation Error::No indent size provided" ; exit 1
+
+    - name: "Report Missing Include Document Start Setting"
+      if: inputs.include-document-start == ''
+      shell: bash
+      run: echo "::error title=Fmtya Input Validation Error::No include document start setting provided" ; exit 1
+
+    - name: "Report Missing Line Ending Type"
+      if: inputs.line-ending-type == ''
+      shell: bash
+      run: echo "::error title=Fmtya Input Validation Error::No line ending type provided" ; exit 1
+
+    - name: "Report Missing Line Breaks Setting"
+      if: inputs.keep-line-breaks == ''
+      shell: bash
+      run: echo "::error title=Fmtya Input Validation Error::No keep line breaks setting provided" ; exit 1
+
+    - name: "Report Missing Anchors Setting"
+      if: inputs.disallow-anchors == ''
+      shell: bash
+      run: echo "::error title=Fmtya Input Validation Error::No disallow anchors setting provided" ; exit 1
+
+    - name: "Report Missing Signoff On Commit"
+      if: inputs.signoff-on-commit == ''
+      shell: bash
+      run: echo "::error title=Fmtya Input Validation Error::No signoff on commit provided" ; exit 1
+
+    - name: "Report Invalid Signoff On Commit"
+      if: inputs.signoff-on-commit != 'true' && inputs.signoff-on-commit != 'false' && inputs.signoff-on-commit != 'yes' && inputs.signoff-on-commit != 'no'
+      shell: bash
+      run: echo "::error title=Fmtya Input Validation Error::Invalid boolean for signoff on commit '$SIGNOFF_ON_COMMIT'" ; exit 1
+      env:
+        SIGNOFF_ON_COMMIT: ${{ inputs.signoff-on-commit }}
+
+    - name: "Report Missing Files To Format"
+      if: inputs.include-files == ''
+      shell: bash
+      run: echo "::error title=Fmtya Input Validation Error::No include files provided" ; exit 1
+
+    - name: "Parse Configuration"
       id: config
       shell: bash
       env:
-        LOG_TITLE: "Validation"
-        YAMLFMT_VERSION: ${{ inputs.yamlfmt-version }}
-        COMMIT_MESSAGE: ${{ inputs.commit-message }}
-        COMMIT_USER_NAME: ${{ inputs.commit-user-name }}
-        COMMIT_USER_EMAIL: ${{ inputs.commit-user-email }}
-        SIGNOFF_ON_COMMIT: ${{ inputs.signoff-on-commit }}
         INCLUDE_FILES: ${{ inputs.include-files }}
         EXCLUDE_FILES: ${{ inputs.exclude-files }}
-        INDENT_SIZE: ${{ inputs.indent-size }}
-        INCLUDE_DOC_START: ${{ inputs.include-document-start }}
-        LINE_ENDING_TYPE: ${{ inputs.line-ending-type }}
-        KEEP_LINE_BREAKS: ${{ inputs.keep-line-breaks }}
-        DISALLOW_ANCHORS: ${{ inputs.disallow-anchors }}
       run: |
-        die() {
-          echo "::error title=${LOG_TITLE}::$@"
-          exit 1
-        }
-
-        err() {
-          echo "::warning title=${LOG_TITLE}::$@"
-        }
-
-        log() {
-          echo "::notice title=${LOG_TITLE}::$@"
-        }
-
-        [ -z "$YAMLFMT_VERSION" ] && die "No yamlfmt version provided"
-        [ -z "$COMMIT_MESSAGE" ] && die "No commit message provided"
-        [ -z "$COMMIT_USER_NAME" ] && die "No commit user name provided"
-        [ -z "$COMMIT_USER_EMAIL" ] && die "No commit user email provided"
-        [ -z "$SIGNOFF_ON_COMMIT" ] &&  err "No signoff on commit provided"
-        [ -z "$INCLUDE_FILES" ] && die "No include files provided"
-        [ -z "$INDENT_SIZE" ] && die "No indent size provided"
-        [ -z "$INCLUDE_DOC_START" ] && die "No include document start setting provided"
-        [ -z "$LINE_ENDING_TYPE" ] && die "No line ending type provided"
-        [ -z "$KEEP_LINE_BREAKS" ] && die "No keep line breaks setting provided"
-        [ -z "$DISALLOW_ANCHORS" ] && die "No disallow anchors setting provided"
-
-        if [ "$SIGNOFF_ON_COMMIT" = "true" ] || [ "$SIGNOFF_ON_COMMIT" = "yes" ]
-        then
-          echo "signoff-on-commit=true" | tee -a "$GITHUB_OUTPUT"
-        else
-          if [ "$SIGNOFF_ON_COMMIT" != "false" ] && [ "$SIGNOFF_ON_COMMIT" != "no" ]
-          then
-            err "Invalid boolean for 'signoff on commit': $SIGNOFF_ON_COMMIT"
-          fi
-
-          echo "signoff-on-commit=false" | tee -a "$GITHUB_OUTPUT"
-        fi
-
+        DELIMITER="$(openssl rand -hex 8)"
+        echo "::add-mask::$DELIMITER"
         echo "include-files=$(echo "$INCLUDE_FILES" | awk 'NF>0' | jq -R | jq -R | jq -s | jq -r tostring)" | tee -a "$GITHUB_OUTPUT"
         echo "exclude-files=$(echo "$EXCLUDE_FILES" | awk 'NF>0' | jq -R | jq -R | jq -s | jq -r tostring)" | tee -a "$GITHUB_OUTPUT"
+        echo "delimiter=$DELIMITER" | tee -a "$GITHUB_OUTPUT"
+
+    - name: "Configure yamlfmt"
+      shell: bash
+      run: |
+        cat << ${{ steps.config.outputs.delimiter }} | awk 'NF>0' | tee ${{ runner.temp }}/yamlfmt.conf
+        ${{ steps.config.outputs.include-files && 'include:
+          - '|| '' }}${{ join(fromJSON(steps.config.outputs.include-files), '
+          - ') || '' }}
+        ${{ steps.config.outputs.exclude-files && 'exclude:
+          - '|| '' }}${{ join(fromJSON(steps.config.outputs.exclude-files), '
+          - ') || '' }}
+        formatter:
+          type: basic
+          indent: ${{ inputs.indent-size }}
+          include_document_start: ${{ inputs.include-document-start }}
+          line_ending: ${{ inputs.line-ending-type }}
+          retain_line_breaks: ${{ inputs.keep-line-breaks }}
+          disallow_anchors: ${{ inputs.disallow-anchors }}
+        ${{ steps.config.outputs.delimiter }}
 
     - name: "Checkout"
       uses: actions/checkout@v3.3.0
@@ -139,28 +175,9 @@ runs:
 
     - name: "Install yamlfmt"
       shell: bash
+      run: go install "github.com/google/yamlfmt/cmd/yamlfmt@$VERSION"
       env:
         VERSION: ${{ inputs.yamlfmt-version }}
-      run: go install "github.com/google/yamlfmt/cmd/yamlfmt@$VERSION"
-
-    - name: "Configure yamlfmt"
-      shell: bash
-      run: |
-        cat << 'EOF' > ${{ runner.temp }}/yamlfmt.conf
-        include:${{ steps.config.outputs.include-files && '
-          - '|| '' }}${{ join(fromJSON(steps.config.outputs.include-files), '
-          - ') || '' }}
-        exclude:${{ steps.config.outputs.exclude-files && '
-          - '|| '' }}${{ join(fromJSON(steps.config.outputs.exclude-files), '
-          - ') || '' }}
-        formatter:
-          type: basic
-          indent: ${{ inputs.indent-size }}
-          include_document_start: ${{ inputs.include-document-start }}
-          line_ending: ${{ inputs.line-ending-type }}
-          retain_line_breaks: ${{ inputs.keep-line-breaks }}
-          disallow_anchors: ${{ inputs.disallow-anchors }}
-        EOF
 
     - name: "Run yamlfmt"
       shell: bash
@@ -182,4 +199,6 @@ runs:
         commit_user_name: ${{ inputs.commit-user-name }}
         commit_user_email: ${{ inputs.commit-user-email }}
         commit_message: ${{ inputs.commit-message }}
-        commit_options: ${{ inputs.signing-private-key != '' && '-S' || '' }} ${{steps.config.outputs.signoff-on-commit == 'true' && '-s' || '' }}
+        commit_options: >-
+          ${{ inputs.signing-private-key != '' && '-S' || '' }}
+          ${{ (inputs.signoff-on-commit == 'true' || inputs.signoff-on-commit == 'yes') && '-s' || '' }}
