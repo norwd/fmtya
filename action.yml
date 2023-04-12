@@ -163,7 +163,7 @@ runs:
         ${{ steps.config.outputs.delimiter }}
 
     - name: "Checkout"
-      uses: actions/checkout@v3.3.0
+      uses: actions/checkout@v3.5.1
       with:
         ref: ${{ github.head_ref }}
         token: ${{ inputs.token || github.token }}
