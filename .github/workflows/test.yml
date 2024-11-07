@@ -40,19 +40,24 @@ jobs:
           signoff-on-commit: ${{ github.actor == github.repository_owner }}
 
           # yamlfmt configuration
-          exclude-files: .github${{ contains(runner.temp, '\') && '\\' || '/' }}testing${{ contains(runner.temp, '\') && '\\' || '/' }}bad.yml
+          exclude-files: |
+            ${{ runner.os	== 'Windows' && '
+            .github\\testing\\bad.yml
+            ' || '
+            .github\\testing\\bad.yml
+            ' }}
+
           include-files: |
             ${{ runner.os	== 'Windows' && '
             action.yml
-            .github\release.yml
-            .github\labeler.yml
-            .github\dependabot.yml
-            .github\workflows\update-latest-tag.yml
-            .github\workflows\test.yml
-            .github\workflows\labeler.yml
-            .github\workflows\audit.yml
-            .github\testing\bad.yml
-            .github\testing\nonexisting.yml
+            .github\\release.yml
+            .github\\labeler.yml
+            .github\\dependabot.yml
+            .github\\workflows\\update-latest-tag.yml
+            .github\\workflows\\test.yml
+            .github\\workflows\\labeler.yml
+            .github\\workflows\\audit.yml
+            .github\\testing\\nonexisting.yml
             ' || '
             **/*.{yaml,yml}
             .github/testing/nonexisting.yml
