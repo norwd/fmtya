@@ -172,6 +172,7 @@ runs:
       uses: actions/setup-go@v5.1.0
       with:
         token: ${{ inputs.token || github.token }}
+        go-version: stable
 
     - name: "Install yamlfmt"
       shell: bash
