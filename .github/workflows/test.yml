@@ -1,0 +1,68 @@
+---
+
+name: "Run Tests"
+run-name: "Run Tests"
+
+on:
+  push:
+
+jobs:
+
+  test_that_fmtya_can_run_on_itself:
+    name: "Test that fmtya can run on itself"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Run fmtya
+        uses: ./
+        with:
+
+          # permission settings
+          token: ${{ secrets.SELF_FMTYA || secrets.GITHUB_TOKEN }}
+
+          # commit information
+          commit-user-name: norwd
+          commit-user-email: 106889957+norwd@users.noreply.github.com
+          signing-private-key: ${{ secrets.AUTO_COMMIT_GPG_PRIVATE_KEY_FMTYA }}
+          signing-passphrase: ${{ secrets.AUTO_COMMIT_GPG_PASSPHRASE_FMTYA }}
+          signoff-on-commit: ${{ github.actor == github.repository_owner }}
+
+          # yamlfmt configuration
+          exclude-files: .github/testing/bad.yml
+          include-files: |
+            **/*.{yaml,yml}
+            .github/testing/nonexisting.yml
+
+  test_that_fmtya_should_report_missing_yamlfmt_version:
+    name: "Test that fmtya should report missing yamlfmt version"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v3
+
+      - id: test
+        continue-on-error: true
+        name: "Run fmtya"
+        uses: ./
+        with:
+          yamlfmt-version: ''
+
+      - name: "Assert"
+        if: steps.test.outcome != 'failure'
+        run: echo "::error title=Assertion Failed::Fmtya should report missing yamlfmt version" ; exit 1
