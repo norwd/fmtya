@@ -9,6 +9,7 @@ on:
 jobs:
 
   test_that_fmtya_can_run_on_itself:
+    if: always()
     name: "Test that fmtya can run on itself"
     runs-on: ${{ matrix.os }}
     strategy:
@@ -43,6 +44,7 @@ jobs:
             .github/testing/nonexisting.yml
 
   test_that_fmtya_should_report_missing_yamlfmt_version:
+    if: always()
     name: "Test that fmtya should report missing yamlfmt version"
     runs-on: ${{ matrix.os }}
     strategy:
