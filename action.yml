@@ -145,8 +145,10 @@ runs:
 
     - name: "Configure yamlfmt"
       shell: bash
+      env:
+        CONFIG_FILE: '${{ runner.temp }}/yamlfmt.conf'
       run: |
-        cat << ${{ steps.config.outputs.delimiter }} | awk 'NF>0' | tee ${{ runner.temp }}/yamlfmt.conf
+        cat << ${{ steps.config.outputs.delimiter }} | awk 'NF>0' | tee ${CONFIG_FILE}
         ${{ steps.config.outputs.include-files && 'include:
           - '|| '' }}${{ join(fromJSON(steps.config.outputs.include-files), '
           - ') || '' }}
@@ -182,7 +184,9 @@ runs:
 
     - name: "Run yamlfmt"
       shell: bash
-      run: ~/go/bin/yamlfmt -conf "${{ runner.temp }}/yamlfmt.conf"
+      run: ~/go/bin/yamlfmt -conf "${CONFIG_FILE}"
+      env:
+        CONFIG_FILE: '${{ runner.temp }}/yamlfmt.conf'
 
     - name: "Setup GPG Keys"
       if: inputs.signing-private-key != ''
