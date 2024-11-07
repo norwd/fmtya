@@ -1,0 +1,92 @@
+---
+
+name: "Run Tests"
+run-name: "Run Tests"
+
+on:
+  push:
+
+jobs:
+
+  test_that_fmtya_can_run_on_itself:
+    if: always()
+    name: "Test that fmtya can run on itself"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Run fmtya
+        uses: ./
+        with:
+
+          # permission settings
+          token: ${{ secrets.SELF_FMTYA || secrets.GITHUB_TOKEN }}
+
+          # commit information
+          commit-user-name: norwd
+          commit-user-email: 106889957+norwd@users.noreply.github.com
+          signing-private-key: ${{ secrets.AUTO_COMMIT_GPG_PRIVATE_KEY_FMTYA }}
+          signing-passphrase: ${{ secrets.AUTO_COMMIT_GPG_PASSPHRASE_FMTYA }}
+          signoff-on-commit: ${{ github.actor == github.repository_owner }}
+
+          # yamlfmt configuration
+          exclude-files: |
+            ${{ runner.os	== 'Windows' && '
+            .github\\testing\\bad.yml
+            ' || '
+            .github\\testing\\bad.yml
+            ' }}
+
+          include-files: |
+            ${{ runner.os	== 'Windows' && '
+            action.yml
+            .github\\release.yml
+            .github\\labeler.yml
+            .github\\dependabot.yml
+            .github\\workflows\\update-latest-tag.yml
+            .github\\workflows\\test.yml
+            .github\\workflows\\labeler.yml
+            .github\\workflows\\audit.yml
+            .github\\testing\\nonexisting.yml
+            ' || '
+            **/*.{yaml,yml}
+            .github/testing/nonexisting.yml
+            ' }}
+
+  test_that_fmtya_should_report_missing_yamlfmt_version:
+    if: always()
+    name: "Test that fmtya should report missing yamlfmt version"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v3
+
+      - id: test
+        continue-on-error: true
+        name: "Run fmtya"
+        uses: ./
+        with:
+          yamlfmt-version: ''
+
+      - name: "Assert"
+        if: steps.test.outcome != 'failure'
+        run: echo "::error title=Assertion Failed::Fmtya should report missing yamlfmt version" ; exit 1

@@ -146,7 +146,7 @@ runs:
     - name: "Configure yamlfmt"
       shell: bash
       run: |
-        cat << ${{ steps.config.outputs.delimiter }} | awk 'NF>0' | tee ${{ runner.temp }}/yamlfmt.conf
+        cat << ${{ steps.config.outputs.delimiter }} | awk 'NF>0' | tee "${CONFIG_FILE}"
         ${{ steps.config.outputs.include-files && 'include:
           - '|| '' }}${{ join(fromJSON(steps.config.outputs.include-files), '
           - ') || '' }}
@@ -161,6 +161,8 @@ runs:
           retain_line_breaks: ${{ inputs.keep-line-breaks }}
           disallow_anchors: ${{ inputs.disallow-anchors }}
         ${{ steps.config.outputs.delimiter }}
+      env:
+        CONFIG_FILE: ${{ format('{0}{1}yamlfmt.conf', runner.temp, contains(runner.temp, '\') && '\' || '/') }}
 
     - name: "Checkout"
       uses: actions/checkout@v3.3.0
@@ -169,9 +171,11 @@ runs:
         token: ${{ inputs.token || github.token }}
 
     - name: "Setup Go"
-      uses: actions/setup-go@v4.0.0
+      uses: actions/setup-go@v5.1.0
       with:
         token: ${{ inputs.token || github.token }}
+        go-version: stable
+        cache: false
 
     - name: "Install yamlfmt"
       shell: bash
@@ -181,7 +185,9 @@ runs:
 
     - name: "Run yamlfmt"
       shell: bash
-      run: ~/go/bin/yamlfmt -conf "${{ runner.temp }}/yamlfmt.conf"
+      run: ~/go/bin/yamlfmt -conf "${CONFIG_FILE}"
+      env:
+        CONFIG_FILE: ${{ format('{0}{1}yamlfmt.conf', runner.temp, contains(runner.temp, '\') && '\' || '/') }}
 
     - name: "Setup GPG Keys"
       if: inputs.signing-private-key != ''
@@ -200,5 +206,4 @@ runs:
         commit_user_email: ${{ inputs.commit-user-email }}
         commit_message: ${{ inputs.commit-message }}
         commit_options: >-
-          ${{ inputs.signing-private-key != '' && '-S' || '' }}
-          ${{ (inputs.signoff-on-commit == 'true' || inputs.signoff-on-commit == 'yes') && '-s' || '' }}
+          ${{ inputs.signing-private-key != '' && '-S' || '' }} ${{ (inputs.signoff-on-commit == 'true' || inputs.signoff-on-commit == 'yes') && '-s' || '' }}
