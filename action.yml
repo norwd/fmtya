@@ -206,5 +206,4 @@ runs:
         commit_user_email: ${{ inputs.commit-user-email }}
         commit_message: ${{ inputs.commit-message }}
         commit_options: >-
-          ${{ inputs.signing-private-key != '' && '-S' || '' }}
-          ${{ (inputs.signoff-on-commit == 'true' || inputs.signoff-on-commit == 'yes') && '-s' || '' }}
+          ${{ inputs.signing-private-key != '' && '-S' || '' }} ${{ (inputs.signoff-on-commit == 'true' || inputs.signoff-on-commit == 'yes') && '-s' || '' }}
