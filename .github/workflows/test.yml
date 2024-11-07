@@ -42,8 +42,8 @@ jobs:
           # yamlfmt configuration
           exclude-files: .github/testing/bad.yml
           include-files: |
-            **/*.{yaml,yml}
-            .github/testing/nonexisting.yml
+            **${{ contains(runner.temp, '\') && '\' || '/' }}*.{yaml,yml}
+            .github${{ contains(runner.temp, '\') && '\' || '/' }}testing${{ contains(runner.temp, '\') && '\' || '/' }}nonexisting.yml
 
   test_that_fmtya_should_report_missing_yamlfmt_version:
     if: always()
